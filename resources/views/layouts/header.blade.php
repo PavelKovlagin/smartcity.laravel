@@ -1,10 +1,22 @@
 <div class="links">
-    <a href="https://laravel.com/docs">Docs</a>
-    <a href="https://laracasts.com">Laracasts</a>
-    <a href="https://laravel-news.com">News</a>
-    <a href="https://blog.laravel.com">Blog</a>
-    <a href="https://nova.laravel.com">Nova</a>
-    <a href="https://forge.laravel.com">Forge</a>
-    <a href="https://vapor.laravel.com">Vapor</a>
-    <a href="https://github.com/laravel/laravel">GitHub</a>
+    <a href=/events>События </a> 
+    @if((Auth::check()) and (Auth::user()->role == "admin"))
+        <a href=/users>Пользователи </a> 
+    @endif 
+        @guest <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+        @if (Route::has('register'))
+        <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+        @endif
+        @else
+
+        <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+            {{ __('Logout') }}
+        </a>
+
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+            @csrf
+        </form>
+        <a> {{ Auth::user()->name }} </a>
+        @endguest
 </div>
