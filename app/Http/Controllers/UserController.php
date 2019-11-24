@@ -26,8 +26,7 @@ class UserController extends Controller
     }
 
     public function updateUser(Request $request) {
-        DB::update('update users set role = :role WHERE id = :user_id', 
-        ['role' => $request->role, 'user_id' => $request->user_id]);
+        \App\User::updateRole($request->user_id, $request->role);
         return redirect("/users");
     }
 

@@ -1,9 +1,9 @@
 @extends('layouts/layout')
 @section('title')
-{{$event->nameEvent}}
+{{$event->eventName}}
 @endsection
 @section('content')
-<p> Название события: {{$event->nameEvent}} </p>
+<p> Название события: {{$event->eventName}} </p>
 <p> Описание события: {{$event->eventDescription}} </p>
 <p> Долгота: {{$event->longitude}} </p>
 <p> Широта: {{$event->latitude}} </p>
@@ -39,6 +39,18 @@ var latitude = {{$event->latitude}};
     </script>
     <div id="map" style="width:600px; height:400px"></div>
     <br><br>
+    
+    <form action="{{ url('/updateEvent') }}" method="POST">
+    @csrf
+       <input type="hidden" name="event_id" value="{{$event->id}}">
+    <p><select name = "status_id">
+        @foreach($statuses as $status)
+        <option value="{{ $status->id }}">{{ $status->statusName }}</option>
+        @endforeach
+    </select></p>   
+        <button type="submit"> Обновить статус </button>
+    </form>
+    
     <form action="{{ url('/addComment') }}" method="POST">
     @csrf
     <input type="hidden" name="event_id" value="{{$event->id}}">

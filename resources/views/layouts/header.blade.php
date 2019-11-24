@@ -2,6 +2,7 @@
     <a href=/events>События </a> 
     @if((Auth::check()) and (Auth::user()->role == "admin"))
         <a href=/users>Пользователи </a> 
+        <a href=/statuses> Статусы </a>
     @endif 
         @guest <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
         @if (Route::has('register'))

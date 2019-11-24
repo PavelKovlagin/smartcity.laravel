@@ -1,13 +1,13 @@
 @extends('layouts/layout')
 @section('title')
-добавить событие
+Добавить событие
 @endsection
 @section('content')
 @include('errors')
 <form action="{{ url('/addEvent') }}" method="POST">
     {{ csrf_field() }}
     <p> Название события:</p>
-    <input type="text" name="nameEvent">
+    <input type="text" name="eventName">
     <p> Описание события:</p>
     <textarea type="text" name="eventDescription">
 </textarea>

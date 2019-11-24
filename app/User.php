@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use DB;
 
 class User extends Authenticatable
 {
@@ -18,6 +19,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name', 'surname', 'subname', 'date', 'role', 'email', 'password', 
     ];
+
+    protected static function updateRole($user_id, $role){
+        DB::update('update users set role = :role WHERE id = :user_id', 
+        ['role' => $role, 'user_id' => $user_id]);
+    }
 
     /**
      * The attributes that should be hidden for arrays.

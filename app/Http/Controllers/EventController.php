@@ -9,59 +9,52 @@ use App;
 
 class EventController extends Controller
 {
+
+    public function apiSelectEvents(){
+        $events = App\Event::selectEvents();
+        return $events;
+    }
+
     public function showEvents(){
         //$events = App\Event::paginate(10);
         //$events = DB::select('SELECT events.id as event_id, users.id as user_id FROM events, users WHERE user_id = users.id');
-        $events = DB::table('events')
-        ->join('users', 'user_id', '=', 'users.id')
-        ->select(
-            'events.id as event_id', 
-            'nameEvent', 
-            'eventDescription',
-            'latitude',
-            'longitude', 
-            'events.date as event_date',
-
-            'users.id as user_id',
-            'email')
-        ->paginate(10);
+        $events = App\Event::selectEventsPaginate();   
         //return dd($events);
         return view('events.events', [
             'title' => 'Все события',
-            'events' => $events
+            'events' => $events,       
         ]);
     }
 
     public function showEvent($id){
         $event = App\Event::find($id);
-        $comments = DB::table('comments')
-        ->join('events', 'comments.event_id', '=', 'events.id')
-        ->join('users', 'comments.user_id', '=', 'users.id')
-        ->select(
-            'email',
-            'text',
-            'dateTime'
-        )
-        ->get();
+        $comments = App\Comment::selectCommentsFromEvent($id);
+        $statuses = App\Status::selectStatuses();
         return view('events.event', [
             'event' => $event,
-            'comments' => $comments
+            'comments' => $comments,
+            'statuses' => $statuses
         ]);
     }
 
     public function addEvent(Request $request){
-        
-            $event = new \App\Event;
-            $event->user_id = Auth::user() -> id;
-            $event->nameEvent = $request->nameEvent;
-            $event->eventDescription = $request->eventDescription;
-            $event->longitude = $request->longitude;
-            $event->latitude = $request->latitude;
-            $event->status = 1;
-            $event->date = Carbon::now();
-            $event->save();
-    
+        if (Auth::check()){
+            $user_id = Auth::user() -> id;
+            App\Event::insertEvent($user_id, $request);
             return redirect("/events");
+        }
+    }
+
+    public function updateEvent(Request $request){
+        if ((Auth::check() and (Auth::user() -> role = "admin"))){
+            $event_id = $request->event_id;
+            $status_id = $request->status_id;
+            App\Event::updateStatus($event_id, $status_id);
+            //return dd($status_id);
+            return redirect ("/events/$event_id");
+        } else {
+            return redirect("/");
+        }
     }
 
     public function deleteEvent($event_id){

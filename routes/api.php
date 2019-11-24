@@ -16,3 +16,12 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/events', 'EventController@apiSelectEvents');
+
+Route::get("/event", function() {
+    $event = App\Event::find(1);
+    return $event;
+});
+
+Route::get('/statuses', 'StatusController@apiSelectStatuses');

@@ -17,14 +17,16 @@
             <th> Описание события </th>
             <th> Долгота </th>
             <th> Широта </th>
+            <th> Статус </th>
             <th> Пользователь </th>
         </tr>
         @foreach ($events as $event)
         <tr>
-            <th> {{$event->nameEvent}} </th>
+            <th> {{$event->eventName}} </th>
             <th> {{$event->eventDescription}} </th>
             <th> {{$event->longitude}} </th>
             <th> {{$event->latitude}} </th>
+            <th> {{$event->statusName}} </th>
             <th> {{$event->email}}</th>
             <th> <a href="/events/{{$event->event_id}}"> Подробно </a></th>
             @if((Auth::check()) and (Auth::user() -> role == "admin"))
