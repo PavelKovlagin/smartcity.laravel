@@ -12,6 +12,7 @@ class Event extends Model
         $events = DB::table('events')
         ->join('users', 'user_id', '=', 'users.id')
         ->join('statuses', 'status_id', '=', 'statuses.id')
+        ->orderBy('dateChange', 'asc')
         ->select(
             'events.id as event_id', 
             'eventName', 
@@ -23,28 +24,32 @@ class Event extends Model
             'statuses.id as status_id',
             'statusName',
             'users.id as user_id',
-            'email')
-        ->get();
+            'email',
+            'visibilityForUser');
         return $events;
     }
 
-    protected static function selectEventsPaginate(){
-        $events = DB::table('events')
-        ->join('users', 'user_id', '=', 'users.id')
-        ->join('statuses', 'status_id', '=', 'statuses.id')
-        ->select(
-            'events.id as event_id', 
-            'eventName', 
-            'eventDescription',
-            'latitude',
-            'longitude', 
-            'events.date as event_date',
-            'dateChange',
-            'statuses.id as status_id',
-            'statusName',
-            'users.id as user_id',
-            'email')
-        ->paginate(10);
+    protected static function selectUserEvents($user_id) {
+        $events = Event::selectEvents()
+        ->where('users.id', '=', $user_id);
+        return $events;
+    }
+
+    protected static function selectEvent($event_id) {
+        $event = Event::selectEvents()
+        ->where('events.id', '=', $event_id);
+        return $event;
+    }
+
+    protected static function selectVisibilityEvents(){
+        $events = Event::selectEvents()
+        ->where('visibilityForUser', '=', 1);        
+        return $events;
+    }
+    
+    protected static function selectEventsDateChange($dateChange) {
+        $events = Event::selectVisibilityEvents()
+        ->where('dateChange', '>=', $dateChange);
         return $events;
     }
 

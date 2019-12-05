@@ -14,7 +14,6 @@
     <table border="1">
         <tr>
             <th> Название события </th>
-            <th> Описание события </th>
             <th> Долгота </th>
             <th> Широта </th>
             <th> Статус </th>
@@ -22,8 +21,7 @@
         </tr>
         @foreach ($events as $event)
         <tr>
-            <th> {{$event->eventName}} </th>
-            <th> {{$event->eventDescription}} </th>
+            <th> {{$event->eventName}} </th>            
             <th> {{$event->longitude}} </th>
             <th> {{$event->latitude}} </th>
             <th> {{$event->statusName}} </th>

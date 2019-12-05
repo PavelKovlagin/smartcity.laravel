@@ -16,7 +16,7 @@ class StatusController extends Controller
     }
 
     public function apiSelectStatuses() {
-        $statuses = App\Status::selectStatuses();
+        $statuses = App\Status::selectVisibilityStatuses();
         return $statuses;
     }
 

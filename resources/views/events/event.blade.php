@@ -3,8 +3,26 @@
 {{$event->eventName}}
 @endsection
 @section('content')
+<form action="{{ url('/updateEvent') }}" method="POST">
+@csrf
+<p> Идентификатор события: {{$event->event_id}} </p>
+
+    @if(Auth::check() and Auth::user() -> role == 'admin')
+    <p> Статус события: </p>
+       <input type="hidden" name="event_id" value="{{$event->event_id}}">
+        <p><select name = "status_id">
+     @foreach($statuses as $status)
+        <option @if($status->id ==  $event->status_id) selected @endif value="{{ $status->id }}">{{ $status->statusName }}</option>
+    @endforeach
+        </select></p>   
+        <button type="submit"> Обновить событие </button>
+    @else
+        <p> Статус события: {{$event->statusName}} </p>
+     @endif
 <p> Название события: {{$event->eventName}} </p>
 <p> Описание события: {{$event->eventDescription}} </p>
+<p> Дата создания: {{$event->event_date}} </p>
+<p> Дата последнего обновления: {{$event->dateChange}} </p>
 <p> Долгота: {{$event->longitude}} </p>
 <p> Широта: {{$event->latitude}} </p>
 <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
@@ -39,26 +57,19 @@ var latitude = {{$event->latitude}};
     </script>
     <div id="map" style="width:600px; height:400px"></div>
     <br><br>
-    
-    <form action="{{ url('/updateEvent') }}" method="POST">
-    @csrf
-       <input type="hidden" name="event_id" value="{{$event->id}}">
-    <p><select name = "status_id">
-        @foreach($statuses as $status)
-        <option value="{{ $status->id }}">{{ $status->statusName }}</option>
-        @endforeach
-    </select></p>   
-        <button type="submit"> Обновить статус </button>
+       
     </form>
-    
-    <form action="{{ url('/addComment') }}" method="POST">
-    @csrf
-    <input type="hidden" name="event_id" value="{{$event->id}}">
-    <p>Текст комментария:</p>
-    <textarea name="comment" cols="50" rows="10">
-    </textarea>
-    <button type="submit"> Отправть </button>
-    </form>
+    @if(Auth::check()) {
+        <form action="{{ url('/addComment') }}" method="POST">
+        @csrf
+        <input type="hidden" name="event_id" value="{{$event->event_id}}">
+        <p>Текст комментария:</p>
+        <textarea name="comment" cols="50" rows="10">
+        </textarea>
+        <button type="submit"> Отправить </button>
+        </form>
+    }
+    @endif
 
     @foreach ($comments as $someComment)
     <p> <font color="black">{{$someComment->email}} {{$someComment->dateTime}}</font></p>

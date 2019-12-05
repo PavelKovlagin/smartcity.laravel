@@ -10,14 +10,24 @@ use App;
 
 class CommentController extends Controller
 {
-    public function addComment(Request $request) {
-        $comment = new \App\Comment;
-        $comment->user_id = Auth::user() -> id;
-        $comment->event_id = $request->event_id;
-        $comment->text = $request->comment;
-        $comment->dateTime = Carbon::now();
-        $comment->save();
+    public function apiSelectComments() {
+        if(!request()->has('event_id')) return "false";
+        $event_id = request('event_id');
+        $comments = \App\Comment::selectCommentsFromEvent($event_id)->get();
+        return $comments;
+    }
 
-        return redirect("/events/$request->event_id");
+    public function addComment(Request $request) {
+        if (Auth::check()){
+            \App\Comment::addComment($request, Auth::user() -> id);
+            return redirect("/events/$request->event_id");
+        } else {
+            return("/events");
+        }     
+    }
+
+    public function selectComments($event_id) {
+        $comments = \App\Comment::selectCommentsFromEvent($event_id)->get();
+        return $comments;
     }
 }

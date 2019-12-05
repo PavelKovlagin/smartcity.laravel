@@ -42,6 +42,8 @@ Route::get('/events/addEvent', function(){
 
 Route::post('/updateEvent', 'EventController@updateEvent');
 
+Route::get("/events/myevents", 'EventController@showUserEvents');
+
 Route::get('/events/{id}', 'EventController@showEvent');
 
 Route::post('/addEvent', 'EventController@addEvent');

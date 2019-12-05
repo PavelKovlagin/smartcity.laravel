@@ -19,9 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/events', 'EventController@apiSelectEvents');
 
-Route::get("/event", function() {
-    $event = App\Event::find(1);
-    return $event;
-});
+Route::get('/eventComments', 'CommentController@apiSelectComments');
+
+Route::get("/event", 'EventController@apiSelectEvent');
 
 Route::get('/statuses', 'StatusController@apiSelectStatuses');

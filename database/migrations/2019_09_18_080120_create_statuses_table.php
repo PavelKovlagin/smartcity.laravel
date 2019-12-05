@@ -17,6 +17,7 @@ class CreateStatusesTable extends Migration
             $table->bigIncrements('id');
             $table->text('statusName');
             $table->text('statusDescription');
+            $table->boolean('visibilityForUser')->default(false);
             $table->timestamps();
         });
     }

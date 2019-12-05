@@ -12,8 +12,15 @@ class Status extends Model
         ->select(
             'id',
             'statusName',
-            'statusDescription')
+            'statusDescription',
+            'visibilityForUser')
         ->paginate(10);
+        return $statuses;
+    }
+
+    protected static function selectVisibilityStatuses() {
+        $statuses = Status::selectStatuses()
+        ->where("visibilityForUser", "=", 1);
         return $statuses;
     }
 
@@ -21,6 +28,7 @@ class Status extends Model
         $status = new \App\Status;
         $status->statusName = $request->statusName;
         $status->statusDescription = $request->statusDescription;
+        $status->visibilityForUser = $request->visibilityForUser;
         $status->save();
     }
 }
