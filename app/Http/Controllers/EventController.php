@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use DB;
@@ -15,6 +16,12 @@ class EventController extends Controller
         $dateChange = request('dateChange');
         if (preg_match("/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/", $dateChange)) {
         $events = App\Event::selectEventsDateChange($dateChange)->get();
+        foreach ($events as $event) {
+            if ($event->visibilityForUser == 0) {
+                $event->eventName = "";
+                $event->eventDescription = "";
+            }
+        }
         return $events;
         } else {
             return "false";  
@@ -26,6 +33,20 @@ class EventController extends Controller
         $event_id = request('event_id');
         $event = App\Event::selectEvent($event_id)->get();
         return $event;
+    }
+
+    public function apiAddEvent(Request $request) {
+        $validator = Validator::make($request->all(), [
+            "eventName" => "required",
+            "eventDescription" => "required",
+            "longitude" => "required|numeric",
+            "latitude" => "required|numeric"
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Error adding event.', $validator->errors());
+        }
+        App\Event::insertEvent(\Auth::id(), $request);
+        return $this->sendResponse($request->all(), 'Event added.');
     }
 
     public function showEvents(){

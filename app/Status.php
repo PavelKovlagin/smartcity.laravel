@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 use DB;
 
 class Status extends Model
@@ -30,5 +31,11 @@ class Status extends Model
         $status->statusDescription = $request->statusDescription;
         $status->visibilityForUser = $request->visibilityForUser;
         $status->save();
+    }
+
+    protected static function updateVisibility($status_id, $visibility) {
+        DB::table('statuses')
+        ->where('id', '=', $status_id)
+        ->update(array('visibilityForUser' => $visibility, 'dateChange' => Carbon::now()));
     }
 }

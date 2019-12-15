@@ -38,7 +38,7 @@ var latitude = {{$event->latitude}};
             var myMap = new ymaps.Map('map', {
                     // При инициализации карты, обязательно нужно указать
                     // ее центр и коэффициент масштабирования
-                    center: [longitude, latitude], // Событие
+                    center: [latitude, longitude], // Событие
                     zoom: 13
                 });
  
@@ -46,7 +46,7 @@ var latitude = {{$event->latitude}};
 			var myPlacemark = new ymaps.Placemark(
                 
 			// Координаты метки
-			[longitude, latitude]        
+			[latitude, longitude]        
 			);
  
 		// Добавление метки на карту
@@ -57,9 +57,9 @@ var latitude = {{$event->latitude}};
     </script>
     <div id="map" style="width:600px; height:400px"></div>
     <br><br>
-       
+
     </form>
-    @if(Auth::check()) {
+    @if(Auth::check())
         <form action="{{ url('/addComment') }}" method="POST">
         @csrf
         <input type="hidden" name="event_id" value="{{$event->event_id}}">
@@ -68,7 +68,6 @@ var latitude = {{$event->latitude}};
         </textarea>
         <button type="submit"> Отправить </button>
         </form>
-    }
     @endif
 
     @foreach ($comments as $someComment)

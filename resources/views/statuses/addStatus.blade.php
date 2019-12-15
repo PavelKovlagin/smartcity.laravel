@@ -3,7 +3,6 @@
 Добавить статус
 @endsection
 @section('content')
-@include('errors')
 <form action="{{ url('/addStatus') }}" method="POST">
     @csrf
     <p> Название статуса:</p>

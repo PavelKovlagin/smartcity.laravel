@@ -17,6 +17,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware('auth:api')->post('/addEvent', 'EventController@apiAddEvent');
+
+Route::post('/register', 'Auth\RegisterController@apiRegister');
+
 Route::get('/events', 'EventController@apiSelectEvents');
 
 Route::get('/eventComments', 'CommentController@apiSelectComments');

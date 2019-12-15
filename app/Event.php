@@ -29,6 +29,18 @@ class Event extends Model
         return $events;
     }
 
+    protected static function selectVisibilityEvents(){
+        $events = Event::selectEvents()
+        ->where('visibilityForUser', '=', 1);        
+        return $events;
+    }
+    
+    protected static function selectEventsDateChange($dateChange) {
+        $events = Event::selectEvents()
+        ->where('dateChange', '>=', $dateChange);
+        return $events;
+    }
+
     protected static function selectUserEvents($user_id) {
         $events = Event::selectEvents()
         ->where('users.id', '=', $user_id);
@@ -39,19 +51,7 @@ class Event extends Model
         $event = Event::selectEvents()
         ->where('events.id', '=', $event_id);
         return $event;
-    }
-
-    protected static function selectVisibilityEvents(){
-        $events = Event::selectEvents()
-        ->where('visibilityForUser', '=', 1);        
-        return $events;
-    }
-    
-    protected static function selectEventsDateChange($dateChange) {
-        $events = Event::selectVisibilityEvents()
-        ->where('dateChange', '>=', $dateChange);
-        return $events;
-    }
+    }  
 
     protected static function updateStatus($event_id, $status_id) {
         DB::table('events')

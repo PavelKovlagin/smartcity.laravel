@@ -32,6 +32,9 @@ Route::get('/statuses/addStatus', function(){
         return view('statuses.addStatus');
 });
 
+Route::get('/statuses/{id}', 'StatusController@showStatus');
+Route::post('/updateVisibility', "StatusController@updateVisibility");
+
 Route::post('/addStatus', 'StatusController@addStatus');
 
 Route::get('/events', 'EventController@showEvents');

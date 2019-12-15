@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -73,5 +74,25 @@ class RegisterController extends Controller
             'role' => "user",
             'password' => Hash::make($data['password']),
         ]);
+    }
+
+    protected function apiRegister(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
+            'c_password' => 'required|same:password',
+        ]);
+         if ($validator->fails()) {
+             return $this->sendError('Validation Error.', $validator->errors());
+         }
+
+         $input = $request->all();
+         $input['password'] = bcrypt($input['password']);
+         $input['role'] = "user";
+         $user = User::create($input);
+         $success['token'] = $user->createToken('MyApp')->accessToken;
+         $success['name'] = $user->name;
+        
+         return $this->sendResponse($success, 'User register successfully.');
     }
 }
