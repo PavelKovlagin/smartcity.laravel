@@ -17,6 +17,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::middleware("auth:api")->post('/addComment', 'CommentController@apiAddComment');
+
 Route::middleware('auth:api')->post('/addEvent', 'EventController@apiAddEvent');
 
 Route::post('/register', 'Auth\RegisterController@apiRegister');

@@ -27,9 +27,6 @@
             <th> {{$event->statusName}} </th>
             <th> {{$event->email}}</th>
             <th> <a href="/events/{{$event->event_id}}"> Подробно </a></th>
-            @if((Auth::check()) and (Auth::user() -> role == "admin"))
-            <th> <a href="/deleteEvent/{{$event->event_id}}"> Удалить </a></th> 
-            @endif
         </tr>
         @endforeach
     </table>
