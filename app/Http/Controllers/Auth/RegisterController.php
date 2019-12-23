@@ -85,6 +85,10 @@ class RegisterController extends Controller
          if ($validator->fails()) {
              return $this->sendError('Validation Error.', $validator->errors());
          }
+         if(User::where('email', '=', $request->email)->exists())
+         {
+             return $this->sendError('Email fail', "email exists");
+         }
 
          $input = $request->all();
          $input['password'] = bcrypt($input['password']);
