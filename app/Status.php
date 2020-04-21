@@ -36,6 +36,6 @@ class Status extends Model
     protected static function updateVisibility($status_id, $visibility) {
         DB::table('statuses')
         ->where('id', '=', $status_id)
-        ->update(array('visibilityForUser' => $visibility, 'dateChange' => Carbon::now()));
+        ->update(array('visibilityForUser' => $visibility));
     }
 }

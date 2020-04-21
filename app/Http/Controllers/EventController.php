@@ -50,44 +50,60 @@ class EventController extends Controller
     }
 
     public function showEvents(){
-        //$events = App\Event::paginate(10);
-        //$events = DB::select('SELECT events.id as event_id, users.id as user_id FROM events, users WHERE user_id = users.id');
-        if ((Auth::check()) and (Auth::user() -> role == 'admin')) {
-            $events = App\Event::selectEvents()->paginate(10);   
+        $authUser = App\User::selectAuthUser();
+        if (request()->has('user_id')){
+            $user = App\User::find(request('user_id'));  
+            if (empty($user)){
+                $title = 'Все события';
+            } else {
+                $title = "События пользователя " . $user->email;
+            }
+            if (Auth::check() AND Auth::user() -> id == request('user_id')){
+                $events = App\Event::selectUserEvents(request('user_id'));
+                $statuses = App\Status::selectStatuses();
+            } else {
+                $events = App\Event::selectVisibilityEvents();
+                $statuses = App\Status::selectVisibilityStatuses();
+            }
+            
         } else {
-            $events = App\Event::selectVisibilityEvents()->paginate(10);
+            if (($authUser <> false) AND ($authUser->levelRights > 1)) {
+                $events = App\Event::selectEvents();
+                $statuses = App\Status::selectStatuses();   
+            } else {
+                $events = App\Event::selectVisibilityEvents();
+                $statuses = App\Status::selectVisibilityStatuses();
+            }
+            $title = "Все события";
         }
-        //return dd($events);
+        if ((request()->has('status_id')) AND ((request('status_id') <> 0))){
+            $events = $events -> where('status_id', '=', request('status_id'));
+        }
+        $events = $events->paginate(10);
+
         return view('events.events', [
-            'title' => 'Все события',
+            'user_id' => request('user_id'),
+            'status_id' => request('status_id'),
+            'statuses' => $statuses,
+            'title' => $title,
             'events' => $events,       
         ]);
     }
 
     public function showEvent($id){
+        $authUser = App\User::selectAuthUser();
         $event = App\Event::selectEvent($id)->get();
+        $user = App\User::selectUser($event[0]->user_id);
         $comments = App\Comment::selectCommentsFromEvent($id)->get();
         $statuses = App\Status::selectStatuses();
-        //dd($event);
         return view('events.event', [
+            'user' => $user,
+            'authUser' => $authUser,
             'event' => $event[0],
             'comments' => $comments,
             'statuses' => $statuses
         ]);
     }
-
-    public function showUserEvents() {
-        if(Auth::check()) {
-            $events = App\Event::selectUserEvents(Auth::user() -> id)->paginate(10);
-            return view ('events.events', [
-                'title' => 'Мои события',
-                'events' => $events
-            ]);
-        } else {
-            return redirect("/login");
-        }
-    }
-
     public function addEvent(Request $request){
         if (Auth::check()){
             $user_id = Auth::user() -> id;
@@ -100,11 +116,9 @@ class EventController extends Controller
 
     public function updateEvent(Request $request){
         if ((Auth::check() and (Auth::user() -> role = "admin"))){
-            $event_id = $request->event_id;
-            $status_id = $request->status_id;
-            App\Event::updateStatus($event_id, $status_id);
+            App\Event::updateEvent($request);
             //return dd($status_id);
-            return redirect ("/events/$event_id");
+            return redirect ("/events/$request->event_id");
         } else {
             return "У вас недостаточно прав";
         }

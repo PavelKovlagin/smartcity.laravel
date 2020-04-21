@@ -3,10 +3,9 @@
 {{$title}}
 @endsection
 @section('content')
-@if((Auth::check()) and (Auth::user() -> role == "admin"))
+@if(($authUser <> false) AND ($authUser->levelRights > 1))
 @if(count($users)>0)
-<h1>{{$title}}</h1>
-    
+<h1>{{$title}}</h1>   
     <table border="1">
         <tr>
             <th> ID </th>
@@ -19,15 +18,16 @@
         </tr>
         @foreach ($users as $user)
         <tr>
-            <th> {{$user->id}} </th>
+            <th> {{$user->user_id}} </th>
             <th> {{$user->surname}} </th>
-            <th> {{$user->name}} </th>
+            <th> {{$user->user_name}} </th>
             <th> {{$user->subname}} </th>
             <th> {{$user->date}} </th>
             <th> {{$user->email}} </th>
-            <th> {{$user->role}} </th>
-            @if((Auth::check()) and (Auth::user() -> role == "admin")) 
-            <th> <a href="/users/user/{{$user->id}}" > Подробно </a><th>
+            <th> {{$user->role_name}} </th>
+            @if($authUser->levelRights > 1)
+            <th> @if( $user->blockDate >= $currentDate) Заблокирован до {{$user->blockDate}}  @else Не заблокирован @endif <th>
+            <th> <a href="/users/user/{{$user->user_id}}" > Подробно </a><th>
             @endif
         </tr>
         @endforeach

@@ -53,10 +53,15 @@ class Event extends Model
         return $event;
     }  
 
-    protected static function updateStatus($event_id, $status_id) {
+    protected static function updateEvent($request) {
         DB::table('events')
-        ->where('events.id', '=', $event_id)
-        ->update(array('status_id' => $status_id, "dateChange" => Carbon::now()));
+        ->where('events.id', '=', $request->event_id)
+        ->update(array('eventName' => $request->eventName, 
+                        'eventDescription' => $request->eventDescription,
+                        'longitude' => $request->longitude,
+                        'latitude'=>$request->latitude,
+                        'status_id' => $request->status_id, 
+                        'dateChange' => Carbon::now()));
     }
 
     protected static function insertEvent($user_id, $request) {

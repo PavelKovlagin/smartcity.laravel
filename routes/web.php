@@ -22,9 +22,11 @@ Route::get('/users', 'UserController@showUsers');
 
 Route::get('/users/user/{user_id}', 'UserController@showUser');
 
-Route::post('/deleteUser', 'UserController@deleteUser');
+Route::post("/updateUser", "UserController@updateUser");
 
-Route::post('/updateUser', 'UserController@updateUser');
+Route::post('/blockedUser', 'UserController@blockedUser');
+
+Route::post('/updateRole', 'UserController@updateRole');
 
 Route::get('/statuses', 'StatusController@showStatuses');
 
@@ -33,7 +35,10 @@ Route::get('/statuses/addStatus', function(){
 });
 
 Route::get('/statuses/{id}', 'StatusController@showStatus');
+
 Route::post('/updateVisibility', "StatusController@updateVisibility");
+
+Route::post('/deleteStatus', 'StatusController@deleteStatus');
 
 Route::post('/addStatus', 'StatusController@addStatus');
 
@@ -44,8 +49,6 @@ Route::get('/events/addEvent', function(){
 });
 
 Route::post('/updateEvent', 'EventController@updateEvent');
-
-Route::get("/events/myevents", 'EventController@showUserEvents');
 
 Route::get('/events/{id}', 'EventController@showEvent');
 

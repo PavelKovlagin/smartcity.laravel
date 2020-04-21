@@ -16,9 +16,11 @@ class CreateEvents extends Migration
         Schema::create('events', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->bigInteger('status_id')->unsigned();
-            $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
+            $table->foreign('status_id')->references('id')->on('statuses');
+            $table->bigInteger('category_id')->unsigned();
+            $table->foreign('category_id')->references('id')->on('categories');
             $table->double('longitude');
             $table->double('latitude');
             $table->text('eventName');

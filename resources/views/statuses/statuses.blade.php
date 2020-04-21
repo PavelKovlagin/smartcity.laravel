@@ -23,9 +23,6 @@
             <th> {{$status->statusDescription}} </th>
             <th> {{$status->visibilityForUser}} </th>
             <th> <a href="/statuses/{{$status->id}}"> Подробно </a></th>
-            @if((Auth::check()) and (Auth::user() -> role == "admin"))
-            <th> <a href="/deleteStatus/{{$status->id}}"> Удалить </a></th> 
-            @endif
         </tr>
         @endforeach
     </table>

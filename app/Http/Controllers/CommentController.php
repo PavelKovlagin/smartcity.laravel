@@ -19,23 +19,27 @@ class CommentController extends Controller
     }
 
     public function apiAddComment(Request $request) {
-
-        $validator = Validator::make($request->all(), [
-            "comment" => "required",
-        ]);
-        if ($validator->fails()) {
-            return $this->sendError('Error adding event.', $validator->errors());
+        if (Auth::user() -> blockDate < Carbon::now()){
+            $validator = Validator::make($request->all(), [
+                "comment" => "required",
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError('Error adding event.', $validator->errors());
+            }
+            \App\Comment::addComment($request, \Auth::id());
+            return $this->sendResponse($request->all(), 'Comment added.');
+        } else {
+            return $this->sendError($request->all(), 'Comment not added.', 200);
         }
-        \App\Comment::addComment($request, \Auth::id());
-        return $this->sendResponse($request->all(), 'Comment added.');
     }
 
     public function addComment(Request $request) {
-        if (Auth::check()){
+        if (Auth::check() AND Auth::user() -> blockDate < Carbon::now()){
             \App\Comment::addComment($request, Auth::user() -> id);
-            return redirect("/events/$request->event_id");
+            return redirect("/events/$request->event_id")->with("error", "Сообщение добавилено");
         } else {
-            return("/events");
+            return redirect("/events/$request->event_id")->with("error", "Вы не можете отправлять сообщения, Ваш профиль заблокирован");
+            
         }     
     }
 

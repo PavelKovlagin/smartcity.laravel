@@ -14,6 +14,7 @@ class EventsSeed extends Seeder
       DB::table('events')->insert([
         'user_id'=>1,
         'status_id'=>1,
+        'category_id'=>1,
         'longitude'=>40.389206,
         'latitude'=>56.148387,
         'eventName'=>'Тестовое событие. Рассматривается',
@@ -24,6 +25,7 @@ class EventsSeed extends Seeder
       DB::table('events')->insert([
         'user_id'=>1,
         'status_id'=>2,
+        'category_id'=>1,
         'longitude'=>40.391116,
         'latitude'=>56.146003,
         'eventName'=>'Тестовое событие. Отклонено',
@@ -34,6 +36,7 @@ class EventsSeed extends Seeder
       DB::table('events')->insert([
         'user_id'=>1,
         'status_id'=>3,
+        'category_id'=>1,
         'longitude'=>40.380831,
         'latitude'=>56.145063,
         'eventName'=>'Тестовое событие. Выполняется',
@@ -44,6 +47,7 @@ class EventsSeed extends Seeder
       DB::table('events')->insert([
         'user_id'=>1,
         'status_id'=>4,
+        'category_id'=>1,
         'longitude'=>40.377398,
         'latitude'=>56.149591, 
         'eventName'=>'Тестовое событие. Завершено',

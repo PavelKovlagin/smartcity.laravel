@@ -3,13 +3,33 @@
 {{$title}}
 @endsection
 @section('content')
+<h1>{{$title}}</h1>
 
 @if (Auth::check())
 <button type="submit" onclick="location.href='/events/addEvent'">Добавить событие</button>
 @endif
 
+<form action="/events" method="GET">
+    <button type="submit">Применить</button>
+    <input type='hidden' name='user_id' value={{$user_id}}>
+    <p>Статус событий <select name = "status_id">
+    <option value="0">Все статусы</option>
+    @foreach($statuses as $status)
+        <option @if ($status_id == $status->id) selected @endif value="{{ $status->id }}">{{ $status->statusName }}</option>
+    @endforeach
+    </select> 
+
+    Категория событий <select name = "cathegory_id">
+    <option value="0">Все категории</option>
+    @foreach($statuses as $status)
+        <option @if ($status_id == $status->id) selected @endif value="{{ $status->id }}">{{ $status->statusName }}</option>
+    @endforeach
+    </select></p> 
+    
+</form>
+
 @if(count($events)>0)
-<h1>{{$title}}</h1>
+
     
     <table border="1">
         <tr>
@@ -25,7 +45,7 @@
             <th> {{$event->longitude}} </th>
             <th> {{$event->latitude}} </th>
             <th> {{$event->statusName}} </th>
-            <th> {{$event->email}}</th>
+            <th> <a href="/users/user/{{$event->user_id}}"> {{$event->email}} </a> </th>
             <th> <a href="/events/{{$event->event_id}}"> Подробно </a></th>
         </tr>
         @endforeach

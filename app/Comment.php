@@ -13,6 +13,8 @@ class Comment extends Model
                     ->join('events', 'comments.event_id', '=', 'events.id')
                     ->join('users', 'comments.user_id', '=', 'users.id')
                      ->select(
+                    'comments.user_id',
+                    'role_id',
                     'email',
                     'text',
                     'dateTime')

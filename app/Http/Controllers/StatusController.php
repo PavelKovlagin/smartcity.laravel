@@ -39,6 +39,15 @@ class StatusController extends Controller
         }
     }
 
+    public function deleteStatus(Request $request) {
+        if (Auth::check() AND Auth::user() -> role = "admin" AND $request->notRemove == 0) {
+            App\Status::destroy($request->status_id);
+            return redirect("/statuses");
+        } else {
+            return redirect("/");
+        }
+    }
+
     public function addStatus(Request $request){
         \App\Status::insertStatus($request);
         return redirect("/statuses");

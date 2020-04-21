@@ -11,6 +11,12 @@
     text-decoration: none;
 }   
 
+P.error{
+    color: RGB(255,0,0);
+    font-size: 15pt;
+
+}
+
 html, body {
     background-color: #fff;
     color: #636b6f;

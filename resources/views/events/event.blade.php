@@ -3,28 +3,53 @@
 {{$event->eventName}}
 @endsection
 @section('content')
-<form action="{{ url('/updateEvent') }}" method="POST">
-@csrf
-<p> Идентификатор события: {{$event->event_id}} </p>
+<p class="error"> {{session('error')}} </p>
+@if ($authUser <> false 
+    AND (($event->user_id == $authUser -> user_id) AND ($event->status_id == 1)
+    OR ($authUser->levelRights > 1) AND (($authUser->levelRights > $user->levelRights) OR ($authUser->user_id == $user->user_id))))
+    <form action="{{ url('/updateEvent') }}" method="POST">
+    @csrf
+    <p> Идентификатор события: {{$event->event_id}} </p>
+    <input type="hidden" name="event_id" value="{{$event->event_id}}">
+    <p> Пользователь: {{$event->email}} </p>
+    <p> Дата создания: {{$event->event_date}} </p>
+    <p> Дата последнего обновления: {{$event->dateChange}} </p>
+    <p> Название события: <input type="text" size=50 name="eventName" value="{{$event->eventName}}"> </p>
+    <p> Статус события: 
 
-    @if(Auth::check() and Auth::user() -> role == 'admin')
-    <p> Статус события: </p>
-       <input type="hidden" name="event_id" value="{{$event->event_id}}">
+        @if($authUser->levelRights > 1)
         <p><select name = "status_id">
-     @foreach($statuses as $status)
-        <option @if($status->id ==  $event->status_id) selected @endif value="{{ $status->id }}">{{ $status->statusName }}</option>
-    @endforeach
-        </select></p>   
-        <button type="submit"> Обновить событие </button>
-    @else
-        <p> Статус события: {{$event->statusName}} </p>
-     @endif
-<p> Название события: {{$event->eventName}} </p>
-<p> Описание события: {{$event->eventDescription}} </p>
-<p> Дата создания: {{$event->event_date}} </p>
-<p> Дата последнего обновления: {{$event->dateChange}} </p>
-<p> Долгота: {{$event->longitude}} </p>
-<p> Широта: {{$event->latitude}} </p>
+        @foreach($statuses as $status)
+            <option @if($status->id ==  $event->status_id) selected @endif value="{{ $status->id }}">{{ $status->statusName }}</option>
+        @endforeach
+            </select></p> 
+        @else
+        {{$event->statusName}}  
+        <input type="hidden" name="status_id" value="{{$event->status_id}}">  
+        @endif
+
+
+    <p>Описание события:<br>
+    <textarea name="eventDescription" cols="50" rows="10"> 
+    {{$event->eventDescription}} 
+    </textarea></p>     
+    <p> Долгота: <input size=10 type="number" step="any" name="longitude" value="{{$event->longitude}}"> </p>
+    <p> Широта: <input size=10 type="number" step="any" name="latitude" value="{{$event->latitude}}"> </p>       
+    <button type="submit"> Обновить событие </button>
+    </form>
+    <br>
+
+    @else    
+    <p> Название события: {{$event->eventName}} </p>
+    <p> Пользователь: {{$event->email}} </p>
+    <p> Статус события: {{$event->statusName}} </p>
+    <p> Описание события: {{$event->eventDescription}} </p>
+    <p> Дата создания: {{$event->event_date}} </p>
+    <p> Дата последнего обновления: {{$event->dateChange}} </p>
+    <p> Долгота: {{$event->longitude}} </p>
+    <p> Широта: {{$event->latitude}} </p>    
+@endif
+
 <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 <script type="text/javascript">
 var longitude = {{$event->longitude}};
@@ -56,10 +81,9 @@ var latitude = {{$event->latitude}};
         }
     </script>
     <div id="map" style="width:600px; height:400px"></div>
-    <br><br>
+    <br>
 
-    </form>
-    @if(Auth::check())
+    @if($authUser <> false)
         <form action="{{ url('/addComment') }}" method="POST">
         @csrf
         <input type="hidden" name="event_id" value="{{$event->event_id}}">
@@ -71,7 +95,7 @@ var latitude = {{$event->latitude}};
     @endif
 
     @foreach ($comments as $someComment)
-    <p> <font color="black">{{$someComment->email}} {{$someComment->dateTime}}</font></p>
+    <p> <a href="/users/user/{{$someComment->user_id}}">{{$someComment->email}}</a> {{$someComment->dateTime}}</p>
     <p>{{$someComment->text}}</p>
     @endforeach
 @endsection

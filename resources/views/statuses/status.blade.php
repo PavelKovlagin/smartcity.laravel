@@ -14,7 +14,14 @@
         <option value=0>Невидимый</option>
         <option value=1>Видимый</option>
         </select></p> 
-    <br><br><br>
     <button type="submit"> Обновить </button>
 </form>
+@if($status->notRemove == 0)
+    <form action="{{ url('/deleteStatus') }}" method="POST">
+    @csrf
+    <input type="hidden" name="status_id" value="{{$status->id}}">
+    <input type="hidden" name="notRemove" value="{{$status->notRemove">
+    <button type="submit"> Удалить </button>
+    </form>
+@endif
 @endsection
