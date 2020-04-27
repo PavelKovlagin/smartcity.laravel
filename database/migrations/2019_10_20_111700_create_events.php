@@ -17,9 +17,9 @@ class CreateEvents extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
-            $table->bigInteger('status_id')->unsigned();
+            $table->bigInteger('status_id')->unsigned()->default('1');
             $table->foreign('status_id')->references('id')->on('statuses');
-            $table->bigInteger('category_id')->unsigned();
+            $table->bigInteger('category_id')->unsigned()->default('1');
             $table->foreign('category_id')->references('id')->on('categories');
             $table->double('longitude');
             $table->double('latitude');

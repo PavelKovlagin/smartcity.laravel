@@ -14,8 +14,7 @@ class Status extends Model
             'id',
             'statusName',
             'statusDescription',
-            'visibilityForUser')
-        ->paginate(10);
+            'visibilityForUser');
         return $statuses;
     }
 
@@ -33,9 +32,12 @@ class Status extends Model
         $status->save();
     }
 
-    protected static function updateVisibility($status_id, $visibility) {
+    protected static function updateStatus($request) {
         DB::table('statuses')
-        ->where('id', '=', $status_id)
-        ->update(array('visibilityForUser' => $visibility));
+        ->where('id', '=', $request->status_id)
+        ->update(array(
+            'statusName' => $request->status_name,
+            'statusDescription' => $request->status_description,
+            'visibilityForUser' => $request->visibilityForUser));
     }
 }

@@ -9,17 +9,39 @@ use DB;
 class Comment extends Model
 {
     protected static function selectCommentsFromEvent($event_id) {
-            $comments = DB::table('comments')
+        $comments = DB::table('comments')
+                ->join('events', 'comments.event_id', '=', 'events.id')
+                ->join('users', 'comments.user_id', '=', 'users.id')
+                ->join('roles', 'users.role_id', '=', 'roles.id')
+                    ->select(
+                'comments.id',
+                'comments.user_id',
+                'role_id',
+                'roles.levelRights as user_levelRights',
+                'email',
+                'text',
+                'dateTime')
+                ->where("events.id", $event_id)
+                ->orderBy('dateTime', 'asc');
+        return $comments;
+    }
+
+    protected static function selectComment($comment_id) {
+        $comments = DB::table('comments')
                     ->join('events', 'comments.event_id', '=', 'events.id')
                     ->join('users', 'comments.user_id', '=', 'users.id')
+                    ->join('roles', 'users.role_id', '=', 'roles.id')
                      ->select(
+                    'comments.id',
                     'comments.user_id',
                     'role_id',
+                    'roles.levelRights as user_levelRights',
                     'email',
                     'text',
                     'dateTime')
-                    ->where("events.id", $event_id)
-                    ->orderBy('dateTime', 'asc');
+                    ->where("comments.id", $comment_id)
+                    ->orderBy('dateTime', 'asc')
+                    ->first();
             return $comments;
     }
 

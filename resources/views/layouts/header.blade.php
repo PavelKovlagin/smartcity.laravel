@@ -3,9 +3,10 @@
     @if(Auth::check())
         <a href=/events?user_id={{Auth::user() -> id }}>Мои события</a> 
         <a href=/users/user/{{Auth::user()->id}}>Мой профиль</a>
-            @if(App\User::selectAuthUser()->levelRights > 1)
+            @if(App\User::selectAuthUser()->levelRights > 1)                
                 <a href=/users>Пользователи </a> 
                 <a href=/statuses> Статусы </a>
+                <a href=/categories>Категории </a>
             @endif
         @endif 
         @guest <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>

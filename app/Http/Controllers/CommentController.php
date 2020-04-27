@@ -34,17 +34,33 @@ class CommentController extends Controller
     }
 
     public function addComment(Request $request) {
-        if (Auth::check() AND Auth::user() -> blockDate < Carbon::now()){
-            \App\Comment::addComment($request, Auth::user() -> id);
-            return redirect("/events/$request->event_id")->with("error", "Сообщение добавилено");
+        $authUser = App\User::selectAuthUser();
+        if ($authUser<>false) {
+            if ($authUser->blocked == false){
+                    \App\Comment::addComment($request, Auth::user() -> id);
+                    return redirect("/events/$request->event_id")->with("error", "Сообщение добавилено");
+                } else {
+                    return redirect("/events/$request->event_id")->with("error", "Вы не можете отправлять сообщения, Ваш профиль заблокирован до " . $authUser->blockDate);           
+            } 
         } else {
-            return redirect("/events/$request->event_id")->with("error", "Вы не можете отправлять сообщения, Ваш профиль заблокирован");
-            
-        }     
+            return redirect("/events/$request->event_id");
+        }    
     }
 
-    public function selectComments($event_id) {
-        $comments = \App\Comment::selectCommentsFromEvent($event_id)->get();
-        return $comments;
+    public function deleteComment(Request $request){
+        $authUser = App\User::selectAuthUser();
+        $comment = App\Comment::selectComment($request->comment_id);
+        if (empty($comment)){
+            return back()->with("error", "Сообщения не существует");
+        }  else {
+            if (($authUser<>false)
+            AND (($authUser->levelRights > $comment->user_levelRights)
+            OR ($authUser->user_id == $comment->user_id))){ 
+                App\Comment::destroy($request->comment_id);                            
+                return back()->with("error", "Сообщение удалено");
+            } else {
+                return back()->with("error", "Недостаточно прав для удаления");
+            }
+        }        
     }
 }

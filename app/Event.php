@@ -12,9 +12,10 @@ class Event extends Model
         $events = DB::table('events')
         ->join('users', 'user_id', '=', 'users.id')
         ->join('statuses', 'status_id', '=', 'statuses.id')
+        ->join('categories', 'category_id', '=', 'categories.id')
         ->orderBy('dateChange', 'asc')
         ->select(
-            'events.id as event_id', 
+            'events.id', 
             'eventName', 
             'eventDescription',
             'latitude',
@@ -23,10 +24,26 @@ class Event extends Model
             'dateChange',
             'statuses.id as status_id',
             'statusName',
+            'categories.id as category_id',
+            'categoryName',
             'users.id as user_id',
             'email',
             'visibilityForUser');
         return $events;
+    }
+
+    protected static function changeCategory($currentCategory_id){
+        $firstCategory_id = Category::selectCategories()->get()[0]->id;
+        DB::table('events')
+        ->where('category_id', '=', $currentCategory_id)
+        ->update(array('category_id' => $firstCategory_id));
+    }
+
+    protected static function changeStatus($currentStatus_id){
+        $firstStatus_id = Status::selectStatuses()->get()[0]->id;
+        DB::table('events')
+        ->where('status_id', '=', $currentStatus_id)
+        ->update(array('status_id' => $firstStatus_id));
     }
 
     protected static function selectVisibilityEvents(){
@@ -49,8 +66,9 @@ class Event extends Model
 
     protected static function selectEvent($event_id) {
         $event = Event::selectEvents()
-        ->where('events.id', '=', $event_id);
-        return $event;
+        ->where('events.id', '=', $event_id)
+        ->get();
+        return $event[0];
     }  
 
     protected static function updateEvent($request) {
@@ -60,7 +78,14 @@ class Event extends Model
                         'eventDescription' => $request->eventDescription,
                         'longitude' => $request->longitude,
                         'latitude'=>$request->latitude,
-                        'status_id' => $request->status_id, 
+                        'category_id' => $request->category_id,
+                        'dateChange' => Carbon::now()));
+    }
+
+    protected static function updateEventStatus($event_id, $status_id) {
+        DB::table('events')
+        ->where('events.id', '=', $event_id)
+        ->update(array('status_id' => $status_id, 
                         'dateChange' => Carbon::now()));
     }
 

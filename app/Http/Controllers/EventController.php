@@ -48,7 +48,7 @@ class EventController extends Controller
         App\Event::insertEvent(\Auth::id(), $request);
         return $this->sendResponse($request->all(), 'Event added.');
     }
-
+    
     public function showEvents(){
         $authUser = App\User::selectAuthUser();
         if (request()->has('user_id')){
@@ -62,10 +62,14 @@ class EventController extends Controller
                 $events = App\Event::selectUserEvents(request('user_id'));
                 $statuses = App\Status::selectStatuses();
             } else {
-                $events = App\Event::selectVisibilityEvents();
-                $statuses = App\Status::selectVisibilityStatuses();
-            }
-            
+                if (($authUser <> false) AND ($authUser->levelRights > 1)) {
+                    $events = App\Event::selectEvents();
+                    $statuses = App\Status::selectStatuses();   
+                } else {
+                    $events = App\Event::selectVisibilityEvents();
+                    $statuses = App\Status::selectVisibilityStatuses();
+                }
+            }            
         } else {
             if (($authUser <> false) AND ($authUser->levelRights > 1)) {
                 $events = App\Event::selectEvents();
@@ -76,15 +80,21 @@ class EventController extends Controller
             }
             $title = "Все события";
         }
+        $categories = App\Category::selectCategories();
         if ((request()->has('status_id')) AND ((request('status_id') <> 0))){
             $events = $events -> where('status_id', '=', request('status_id'));
+        }
+        if ((request()->has('category_id')) AND ((request('category_id') <> 0))){
+            $events = $events -> where('category_id', '=', request('category_id'));
         }
         $events = $events->paginate(10);
 
         return view('events.events', [
             'user_id' => request('user_id'),
             'status_id' => request('status_id'),
-            'statuses' => $statuses,
+            'category_id' => request('category_id'),
+            'statuses' => $statuses->get(),
+            'categories' => $categories->get(),
             'title' => $title,
             'events' => $events,       
         ]);
@@ -92,35 +102,47 @@ class EventController extends Controller
 
     public function showEvent($id){
         $authUser = App\User::selectAuthUser();
-        $event = App\Event::selectEvent($id)->get();
-        $user = App\User::selectUser($event[0]->user_id);
+        $event = App\Event::selectEvent($id);
+        $user = App\User::selectUser($event->user_id);
         $comments = App\Comment::selectCommentsFromEvent($id)->get();
         $statuses = App\Status::selectStatuses();
+        $categories = App\Category::selectCategories();
         return view('events.event', [
             'user' => $user,
             'authUser' => $authUser,
-            'event' => $event[0],
+            'event' => $event,
             'comments' => $comments,
-            'statuses' => $statuses
-        ]);
+            'statuses' => $statuses->get(),
+            'categories' => $categories->get()]);
     }
     public function addEvent(Request $request){
-        if (Auth::check()){
+        $authUser = App\User::selectAuthUser();
+        if ($authUser<>false AND $authUser->blocked == false){
             $user_id = Auth::user() -> id;
             App\Event::insertEvent($user_id, $request);
             return redirect("/events");
         } else {
-            return ("/");
+            return redirect("/events");
         }
     }
 
     public function updateEvent(Request $request){
         if ((Auth::check() and (Auth::user() -> role = "admin"))){
             App\Event::updateEvent($request);
-            //return dd($status_id);
             return redirect ("/events/$request->event_id");
         } else {
             return "У вас недостаточно прав";
+        }
+    }
+
+    public function updateEventStatus(Request $request){
+        $authUser = App\User::selectAuthUser();
+        $user = App\User::selectUser($request->user_id);
+        if (($authUser<>false)
+            AND (($authUser->levelRights > $user->levelRights)
+            OR ($authUser->user_id == $request->user_id))){
+            App\Event::updateEventStatus($request->event_id, $request->status_id);
+            return back();
         }
     }
 

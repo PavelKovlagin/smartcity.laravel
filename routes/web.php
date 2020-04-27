@@ -27,7 +27,7 @@ Route::post("/updateUser", "UserController@updateUser");
 Route::post('/blockedUser', 'UserController@blockedUser');
 
 Route::post('/updateRole', 'UserController@updateRole');
-
+//работа со статусами
 Route::get('/statuses', 'StatusController@showStatuses');
 
 Route::get('/statuses/addStatus', function(){
@@ -36,19 +36,36 @@ Route::get('/statuses/addStatus', function(){
 
 Route::get('/statuses/{id}', 'StatusController@showStatus');
 
-Route::post('/updateVisibility', "StatusController@updateVisibility");
+Route::post('/updateStatus', "StatusController@updateStatus");
 
 Route::post('/deleteStatus', 'StatusController@deleteStatus');
 
 Route::post('/addStatus', 'StatusController@addStatus');
+//работа с категориями
+Route::get('/categories', 'CategoryController@showCategories');
 
+Route::get('/categories/addCategory', function(){
+        return view('categories.addCategory');
+});
+
+Route::get('/categories/{id}', 'CategoryController@showCategory');
+
+Route::post('/updateCategory', "CategoryController@updateCategory");
+
+Route::post('/deleteCategory', 'CategoryController@deleteCategory');
+
+Route::post('/addCategory', 'CategoryController@addCategory');
+
+//работа с событиями
 Route::get('/events', 'EventController@showEvents');
 
 Route::get('/events/addEvent', function(){
-        return view('events.addEvent');
+        return view('events.addEvent', ['authUser' => App\User::selectAuthUser()]);
 });
 
 Route::post('/updateEvent', 'EventController@updateEvent');
+
+Route::post('/updateEventStatus', 'EventController@updateEventStatus');
 
 Route::get('/events/{id}', 'EventController@showEvent');
 
@@ -58,7 +75,11 @@ Route::get('/deleteEvent/{event_id}', 'EventController@deleteEvent');
 
 Route::get('/events/considersEvents', 'EventController@showConsidersEvents');
 
+//работа с комментариями
+
 Route::post('/addComment', 'CommentController@addComment');
+
+Route::post('/deleteComment', 'CommentController@deleteComment');
 
 Auth::routes();
 

@@ -3,41 +3,47 @@
 {{$event->eventName}}
 @endsection
 @section('content')
+{{session('hey')}}
 <p class="error"> {{session('error')}} </p>
 @if ($authUser <> false 
     AND (($event->user_id == $authUser -> user_id) AND ($event->status_id == 1)
     OR ($authUser->levelRights > 1) AND (($authUser->levelRights > $user->levelRights) OR ($authUser->user_id == $user->user_id))))
-    <form action="{{ url('/updateEvent') }}" method="POST">
-    @csrf
-    <p> Идентификатор события: {{$event->event_id}} </p>
-    <input type="hidden" name="event_id" value="{{$event->event_id}}">
     <p> Пользователь: {{$event->email}} </p>
     <p> Дата создания: {{$event->event_date}} </p>
     <p> Дата последнего обновления: {{$event->dateChange}} </p>
-    <p> Название события: <input type="text" size=50 name="eventName" value="{{$event->eventName}}"> </p>
-    <p> Статус события: 
 
-        @if($authUser->levelRights > 1)
-        <p><select name = "status_id">
+    <form action="/updateEvent" method="POST">
+    @csrf
+    <input type="hidden" name="event_id" value="{{$event->id}}">    
+    <p> Название события: <input type="text" size=50 name="eventName" value="{{$event->eventName}}"> </p>
+    <p>Описание события:</p>
+    <textarea name="eventDescription" cols="50" rows="10">{{$event->eventDescription}}</textarea>     
+    <p> Долгота: <input size=10 type="number" step="any" name="longitude" value="{{$event->longitude}}"> </p>
+    <p> Широта: <input size=10 type="number" step="any" name="latitude" value="{{$event->latitude}}"> </p>       
+    <p>Категория события: <select name = "category  _id">
+        @foreach($categories as $category)
+            <option @if($category->id ==  $event->category_id) selected @endif value="{{ $category->id }}">{{ $category->categoryName }}</option>
+        @endforeach
+        </select></p>
+    <button type="submit"> Обновить информацию о событии </button>
+    </form>
+
+    <br> 
+    @if ($authUser->levelRights > 1)
+        <form action="/updateEventStatus" method="POST">
+        @csrf
+        <input type="hidden" name="event_id" value="{{$event->id}}">
+        <input type="hidden" name="user_id" value="{{$event->user_id}}">
+        <p>Статус события: <select name = "status_id">
         @foreach($statuses as $status)
             <option @if($status->id ==  $event->status_id) selected @endif value="{{ $status->id }}">{{ $status->statusName }}</option>
         @endforeach
-            </select></p> 
-        @else
-        {{$event->statusName}}  
-        <input type="hidden" name="status_id" value="{{$event->status_id}}">  
-        @endif
-
-
-    <p>Описание события:<br>
-    <textarea name="eventDescription" cols="50" rows="10"> 
-    {{$event->eventDescription}} 
-    </textarea></p>     
-    <p> Долгота: <input size=10 type="number" step="any" name="longitude" value="{{$event->longitude}}"> </p>
-    <p> Широта: <input size=10 type="number" step="any" name="latitude" value="{{$event->latitude}}"> </p>       
-    <button type="submit"> Обновить событие </button>
-    </form>
-    <br>
+        </select></p>
+        <button type="submin">Обновить статус события</button> 
+        </form>
+    @else
+        <p>Статус события: {{$event->statusName}}</p>  
+    @endif
 
     @else    
     <p> Название события: {{$event->eventName}} </p>
@@ -86,16 +92,24 @@ var latitude = {{$event->latitude}};
     @if($authUser <> false)
         <form action="{{ url('/addComment') }}" method="POST">
         @csrf
-        <input type="hidden" name="event_id" value="{{$event->event_id}}">
+        <input type="hidden" name="event_id" value="{{$event->id}}">
         <p>Текст комментария:</p>
-        <textarea name="comment" cols="50" rows="10">
-        </textarea>
+        <textarea name="comment" cols="50" rows="10"></textarea>
         <button type="submit"> Отправить </button>
         </form>
     @endif
 
-    @foreach ($comments as $someComment)
-    <p> <a href="/users/user/{{$someComment->user_id}}">{{$someComment->email}}</a> {{$someComment->dateTime}}</p>
-    <p>{{$someComment->text}}</p>
+    @foreach ($comments as $comment)
+    <p> <a href="/users/user/{{$comment->user_id}}">{{$comment->email}}</a> {{$comment->dateTime}}</p>
+    <p>{{$comment->text}}</p>
+    @if (($authUser<>false) 
+        AND (($authUser->levelRights > $comment->user_levelRights)
+        OR ($authUser->user_id == $comment->user_id)))
+        <form action="/deleteComment" method="POST">
+        @csrf
+        <input type='hidden' name='comment_id' value={{$comment->id}}>
+        <button type="submit">Удалить</button>
+        </form>
+    @endif
     @endforeach
 @endsection
