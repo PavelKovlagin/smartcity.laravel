@@ -25,17 +25,20 @@
     <p> Email: {{$user->email}} </p>
 
         @if(($user->user_id <> $authUser->user_id))
-            @if ($authUser->levelRights > $user->levelRights) 
-                <form action="{{ url('/updateRole') }}" method="POST">
+
+            @if($authUser->levelRights == 3)
+            <form action="{{ url('/updateRole') }}" method="POST">
                 @csrf
                 <input type="hidden" name="user_id" value="{{$user->user_id}}">
-                <select name="role">
-                    <option value="user">user</option>
-                    <option value="moderator">moderator</option>
+                <select name="role_id">
+                    @foreach($roles as $role)
+                    <option @if($user->role_id == $role->role_id) selected @endif value="{{$role->role_id}}">{{$role->role_name}}</option>
+                    @endforeach
                 </select>
                 <button type="submit"> Обновить </button>
                 </form>
-
+            @endif
+            @if ($authUser->levelRights > $user->levelRights)             
                 <form action="{{ url('/blockedUser')}}" method="POST">
                 @csrf
                 <input type="hidden" name="user_id" value="{{$user->user_id}}">

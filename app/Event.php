@@ -32,26 +32,12 @@ class Event extends Model
         return $events;
     }
 
-    protected static function changeCategory($currentCategory_id){
-        $firstCategory_id = Category::selectCategories()->get()[0]->id;
-        DB::table('events')
-        ->where('category_id', '=', $currentCategory_id)
-        ->update(array('category_id' => $firstCategory_id));
-    }
-
-    protected static function changeStatus($currentStatus_id){
-        $firstStatus_id = Status::selectStatuses()->get()[0]->id;
-        DB::table('events')
-        ->where('status_id', '=', $currentStatus_id)
-        ->update(array('status_id' => $firstStatus_id));
-    }
-
     protected static function selectVisibilityEvents(){
         $events = Event::selectEvents()
         ->where('visibilityForUser', '=', 1);        
         return $events;
     }
-    
+
     protected static function selectEventsDateChange($dateChange) {
         $events = Event::selectEvents()
         ->where('dateChange', '>=', $dateChange);
@@ -64,12 +50,35 @@ class Event extends Model
         return $events;
     }
 
+    public static function selectVisibilityUserEvents($user_id) {
+        $events = Event::selectEvents()
+        ->where('users.id', '=', $user_id)
+        ->where('visibilityForUser', '=', 1);
+        return $events;
+    }
+
     protected static function selectEvent($event_id) {
         $event = Event::selectEvents()
         ->where('events.id', '=', $event_id)
         ->get();
         return $event[0];
     }  
+
+    protected static function changeCategory($currentCategory_id){
+        $firstCategory_id = Category::selectCategories()->get()[0]->id;
+        DB::table('events')
+        ->where('category_id', '=', $currentCategory_id)
+        ->update(array('category_id' => $firstCategory_id,
+                        'dateChange' => Carbon::now()));
+    }
+
+    protected static function changeStatus($currentStatus_id){
+        $firstStatus_id = Status::selectStatuses()->get()[0]->id;
+        DB::table('events')
+        ->where('status_id', '=', $currentStatus_id)
+        ->update(array('status_id' => $firstStatus_id,
+                        'dateChange' => Carbon::now()));
+    }
 
     protected static function updateEvent($request) {
         DB::table('events')

@@ -81,9 +81,9 @@ class User extends Authenticatable
             'date' => $date]);
     }
 
-    protected static function updateRole($user_id, $role){
-        DB::update('update users set role = :role WHERE id = :user_id', 
-        ['role' => $role, 'user_id' => $user_id]);
+    protected static function updateRole($user_id, $role_id){
+        DB::update('update users set role_id = :role_id WHERE id = :user_id', 
+        ['role_id' => $role_id, 'user_id' => $user_id]);
     }
 
     /**

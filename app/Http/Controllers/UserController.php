@@ -13,7 +13,9 @@ class UserController extends Controller
     public function showUser($user_id) {
         $authUser = App\User::selectAuthUser();
         $user = App\User::selectUser($user_id);
+        $roles = App\Role::selectRolesWithLevelRights($authUser->levelRights);
         return view("users.user", [
+            'roles' => $roles,
             'authUser' => $authUser,
             'user' => $user]);
     }
@@ -49,7 +51,7 @@ class UserController extends Controller
     }
 
     public function updateRole(Request $request) {
-        \App\User::updateRole($request->user_id, $request->role);
+        \App\User::updateRole($request->user_id, $request->role_id);
         return redirect("/users/user/$request->user_id");
     }
 

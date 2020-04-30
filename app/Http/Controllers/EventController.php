@@ -51,25 +51,15 @@ class EventController extends Controller
     
     public function showEvents(){
         $authUser = App\User::selectAuthUser();
-        if (request()->has('user_id')){
-            $user = App\User::find(request('user_id'));  
-            if (empty($user)){
-                $title = 'Все события';
-            } else {
-                $title = "События пользователя " . $user->email;
-            }
-            if (Auth::check() AND Auth::user() -> id == request('user_id')){
+        if (request()->has('user_id') 
+            AND (!empty($user = App\User::find(request('user_id'))))){
+            $title = "События пользователя " . $user->email;
+            if (($authUser <> false) AND ($authUser->user_id == request('user_id') OR ($authUser->levelRights > 1))){
                 $events = App\Event::selectUserEvents(request('user_id'));
                 $statuses = App\Status::selectStatuses();
             } else {
-                if (($authUser <> false) AND ($authUser->levelRights > 1)) {
-                    $events = App\Event::selectEvents();
-                    $statuses = App\Status::selectStatuses();   
-                } else {
-                    $events = App\Event::selectVisibilityEvents();
-                    $statuses = App\Status::selectVisibilityStatuses();
-                }
-            }            
+                    $events = App\Event::selectVisibilityUserEvents($user->id);
+                    $statuses = App\Status::selectVisibilityStatuses();}                      
         } else {
             if (($authUser <> false) AND ($authUser->levelRights > 1)) {
                 $events = App\Event::selectEvents();
@@ -137,7 +127,7 @@ class EventController extends Controller
 
     public function updateEventStatus(Request $request){
         $authUser = App\User::selectAuthUser();
-        $user = App\User::selectUser($request->user_id);
+        $user = App\User::selectUser($request->user_id);        
         if (($authUser<>false)
             AND (($authUser->levelRights > $user->levelRights)
             OR ($authUser->user_id == $request->user_id))){

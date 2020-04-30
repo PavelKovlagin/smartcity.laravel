@@ -14,8 +14,14 @@
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
+
+
 Route::get('/', function(){
-        return view('welcome');
+        $images = App\Image::selectImages();
+        return view('welcome', [
+                'images' => $images
+
+        ]);
 });
 
 Route::get('/users', 'UserController@showUsers');
@@ -81,6 +87,12 @@ Route::post('/addComment', 'CommentController@addComment');
 
 Route::post('/deleteComment', 'CommentController@deleteComment');
 
+//работа с изображениями
+
+Route::post('/uploadImage', 'ImageController@uploadImage');
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+
