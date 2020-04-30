@@ -6,7 +6,9 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use DB;
 
 class Controller extends BaseController
 {
@@ -28,5 +30,15 @@ class Controller extends BaseController
             'message' => $message,
         ];
         return response()->json($response, $code);
+    }
+
+    public function checkExistsImages($images){
+        foreach ($images as $key => $image){
+            if (Storage::disk("public")->exists($image->image_name) == false){        
+                unset($images[$key]);        
+                DB::table('images')->where('name', '=', $image->image_name)->delete();
+            }
+        }   
+        return $images;
     }
 }

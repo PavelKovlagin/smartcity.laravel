@@ -6,7 +6,7 @@
 @include('errors')
 @if($authUser<>false)
     @if($authUser->blocked == false)    
-    <form action="{{ url('/addEvent') }}" method="POST">
+    <form enctype="multipart/form-data" action="{{ url('/addEvent') }}" method="POST">
         {{ csrf_field() }}    
         <p> Название события:</p>
         <input type="text" name="eventName">
@@ -16,17 +16,12 @@
         <input type="number" step="any" name="longitude">
         <p> Широта:</p>
         <input type="number" step="any" name="latitude">
+        <p>Изображения</p>
+        <input multiple type="file" name="images[]" accept="image/*">
         <br><br><br>
         <button type="submit"> Добавить </button>
-    </form>
-    
-    <form action="/uploadImage" enctype="multipart/form-data" method="POST">
-    @csrf
-    <input multiple type="file" name="images[]">
-    <br><br><br>
-    <button type="submit">Загрузить</button>
-    
-    </form>
+        
+    </form>    
     @else
     <p class='error'>Вы не можете добавлять события, Ваш профиль заблокирован до {{$authUser->blockDate}} </p>
     @endif

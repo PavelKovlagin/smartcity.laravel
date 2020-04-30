@@ -35,5 +35,6 @@ class Image extends Model
         $image->name = $file_name;
         $image->user_id = $user_id;
         $image->save();
+        return $image->id;
     }
 }

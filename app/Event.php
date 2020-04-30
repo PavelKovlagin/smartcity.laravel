@@ -109,5 +109,6 @@ class Event extends Model
             $event->date = Carbon::now();
             $event->dateChange = Carbon::now();
             $event->save();
+            return $event->id;
     }
 }

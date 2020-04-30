@@ -5,13 +5,15 @@
 @section('content')
 {{session('hey')}}
 <p class="error"> {{session('error')}} </p>
+<p> Пользователь: {{$event->email}} </p>
+<p> Дата создания: {{$event->event_date}} </p>
+<p> Дата последнего обновления: {{$event->dateChange}} </p>
+@foreach($eventImages as $image)
+    <img src="{{asset('storage')}}/{{$image->image_name}}" height=150px>
+    @endforeach
 @if ($authUser <> false 
     AND (($event->user_id == $authUser -> user_id) AND ($event->status_id == 1)
     OR ($authUser->levelRights > 1) AND (($authUser->levelRights > $user->levelRights) OR ($authUser->user_id == $user->user_id))))
-    <p> Пользователь: {{$event->email}} </p>
-    <p> Дата создания: {{$event->event_date}} </p>
-    <p> Дата последнего обновления: {{$event->dateChange}} </p>
-
     <form action="/updateEvent" method="POST">
     @csrf
     <input type="hidden" name="event_id" value="{{$event->id}}">    
@@ -20,7 +22,7 @@
     <textarea name="eventDescription" cols="50" rows="10">{{$event->eventDescription}}</textarea>     
     <p> Долгота: <input size=10 type="number" step="any" name="longitude" value="{{$event->longitude}}"> </p>
     <p> Широта: <input size=10 type="number" step="any" name="latitude" value="{{$event->latitude}}"> </p>       
-    <p>Категория события: <select name = "category  _id">
+    <p>Категория события: <select name = "category_id">
         @foreach($categories as $category)
             <option @if($category->id ==  $event->category_id) selected @endif value="{{ $category->id }}">{{ $category->categoryName }}</option>
         @endforeach
@@ -47,11 +49,8 @@
 
     @else    
     <p> Название события: {{$event->eventName}} </p>
-    <p> Пользователь: {{$event->email}} </p>
     <p> Статус события: {{$event->statusName}} </p>
     <p> Описание события: {{$event->eventDescription}} </p>
-    <p> Дата создания: {{$event->event_date}} </p>
-    <p> Дата последнего обновления: {{$event->dateChange}} </p>
     <p> Долгота: {{$event->longitude}} </p>
     <p> Широта: {{$event->latitude}} </p>    
 @endif

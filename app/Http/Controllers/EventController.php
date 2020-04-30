@@ -17,6 +17,7 @@ class EventController extends Controller
         if (preg_match("/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/", $dateChange)) {
         $events = App\Event::selectEventsDateChange($dateChange)->get();
         foreach ($events as $event) {
+            //if ($authUser->user_id <> $event->user_id)
             if ($event->visibilityForUser == 0) {
                 $event->eventName = "";
                 $event->eventDescription = "";
@@ -47,6 +48,17 @@ class EventController extends Controller
         }
         App\Event::insertEvent(\Auth::id(), $request);
         return $this->sendResponse($request->all(), 'Event added.');
+    }
+
+    public function addEvent(Request $request){
+        $authUser = App\User::selectAuthUser();
+        if ($authUser<>false AND $authUser->blocked == false){
+            $event_id = App\Event::insertEvent($authUser->user_id, $request);
+            App\EventImage::insertEventImages($request->images, $event_id, $authUser->user_id);            
+            return redirect("/events");
+        } else {
+            return redirect("/events");
+        }
     }
     
     public function showEvents(){
@@ -97,31 +109,31 @@ class EventController extends Controller
         $comments = App\Comment::selectCommentsFromEvent($id)->get();
         $statuses = App\Status::selectStatuses();
         $categories = App\Category::selectCategories();
+        $eventImages = $this::checkExistsImages(App\EventImage::selectEventImages($event->id)->get());
+        //return dd($eventImages->get());
         return view('events.event', [
             'user' => $user,
             'authUser' => $authUser,
             'event' => $event,
             'comments' => $comments,
             'statuses' => $statuses->get(),
+            'eventImages' => $eventImages,
             'categories' => $categories->get()]);
     }
-    public function addEvent(Request $request){
-        $authUser = App\User::selectAuthUser();
-        if ($authUser<>false AND $authUser->blocked == false){
-            $user_id = Auth::user() -> id;
-            App\Event::insertEvent($user_id, $request);
-            return redirect("/events");
-        } else {
-            return redirect("/events");
-        }
-    }
+
+    
 
     public function updateEvent(Request $request){
-        if ((Auth::check() and (Auth::user() -> role = "admin"))){
+        $authUser = App\User::selectAuthUser();
+        $event = App\Event::selectEvent($request->event_id);
+        $user = App\User::selectUser($event->user_id);
+        if (($authUser<>false) 
+            AND (($authUser->levelRights > $user->levelRights)
+                OR (($authUser->user_id == $user->user_id) AND ($event->status_id == 1)))) {
             App\Event::updateEvent($request);
             return redirect ("/events/$request->event_id");
         } else {
-            return "У вас недостаточно прав";
+            return redirect ("/events/$request->event_id");;
         }
     }
 

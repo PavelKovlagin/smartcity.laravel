@@ -18,10 +18,7 @@ use Carbon\Carbon;
 
 Route::get('/', function(){
         $images = App\Image::selectImages();
-        return view('welcome', [
-                'images' => $images
-
-        ]);
+        return view('welcome');
 });
 
 Route::get('/users', 'UserController@showUsers');
@@ -33,6 +30,7 @@ Route::post("/updateUser", "UserController@updateUser");
 Route::post('/blockedUser', 'UserController@blockedUser');
 
 Route::post('/updateRole', 'UserController@updateRole');
+
 //работа со статусами
 Route::get('/statuses', 'StatusController@showStatuses');
 
@@ -47,6 +45,7 @@ Route::post('/updateStatus', "StatusController@updateStatus");
 Route::post('/deleteStatus', 'StatusController@deleteStatus');
 
 Route::post('/addStatus', 'StatusController@addStatus');
+
 //работа с категориями
 Route::get('/categories', 'CategoryController@showCategories');
 
