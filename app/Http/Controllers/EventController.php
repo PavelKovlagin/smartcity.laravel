@@ -60,6 +60,21 @@ class EventController extends Controller
             return redirect("/events");
         }
     }
+
+    public function updateEvent(Request $request){
+        $authUser = App\User::selectAuthUser();
+        $event = App\Event::selectEvent($request->event_id);
+        $user = App\User::selectUser($event->user_id);
+        if (($authUser<>false) 
+            AND (($authUser->levelRights > $user->levelRights)
+                OR (($authUser->user_id == $user->user_id) AND ($event->status_id == 1 OR $authUser->levelRights > 1)))) {
+            App\EventImage::insertEventImages($request->images, $request->event_id, $authUser->user_id);   
+            App\Event::updateEvent($request);
+            return redirect ("/events/$request->event_id");
+        } else {
+            return redirect ("/events/$request->event_id");;
+        }
+    }
     
     public function showEvents(){
         $authUser = App\User::selectAuthUser();
@@ -119,22 +134,6 @@ class EventController extends Controller
             'statuses' => $statuses->get(),
             'eventImages' => $eventImages,
             'categories' => $categories->get()]);
-    }
-
-    
-
-    public function updateEvent(Request $request){
-        $authUser = App\User::selectAuthUser();
-        $event = App\Event::selectEvent($request->event_id);
-        $user = App\User::selectUser($event->user_id);
-        if (($authUser<>false) 
-            AND (($authUser->levelRights > $user->levelRights)
-                OR (($authUser->user_id == $user->user_id) AND ($event->status_id == 1)))) {
-            App\Event::updateEvent($request);
-            return redirect ("/events/$request->event_id");
-        } else {
-            return redirect ("/events/$request->event_id");;
-        }
     }
 
     public function updateEventStatus(Request $request){

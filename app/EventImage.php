@@ -12,6 +12,7 @@ class EventImage extends Model
     public static function selectEventImages($event_id) {
         $eventImages = DB::table('event_images')
         ->join('images', 'images.id', '=', 'image_id')
+        ->where("event_id", "=", $event_id)
         ->select(
             'images.id as image_id', 
             'event_id', 
@@ -19,6 +20,13 @@ class EventImage extends Model
             'user_id',
         );
         return $eventImages;
+    }
+
+    public static function selectEventImage($event_id, $eventImage_id) {
+        $eventImage = EventImage::selectEventImages($event_id)
+        ->where("image_id", "=", $eventImage_id)
+        ->first();
+        return $eventImage;
     }
 
     public static function insertEventImages($images, $event_id, $user_id){

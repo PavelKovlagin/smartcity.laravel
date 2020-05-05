@@ -80,6 +80,8 @@ Route::get('/deleteEvent/{event_id}', 'EventController@deleteEvent');
 
 Route::get('/events/considersEvents', 'EventController@showConsidersEvents');
 
+Route::post("/deleteEventImage", "EventImageController@deleteEventImage");
+
 //работа с комментариями
 
 Route::post('/addComment', 'CommentController@addComment');

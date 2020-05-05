@@ -8,18 +8,25 @@
 <p> Пользователь: {{$event->email}} </p>
 <p> Дата создания: {{$event->event_date}} </p>
 <p> Дата последнего обновления: {{$event->dateChange}} </p>
-@foreach($eventImages as $image)
-    <img src="{{asset('storage')}}/{{$image->image_name}}" height=150px>
-    @endforeach
+
 @if ($authUser <> false 
     AND (($event->user_id == $authUser -> user_id) AND ($event->status_id == 1)
     OR ($authUser->levelRights > 1) AND (($authUser->levelRights > $user->levelRights) OR ($authUser->user_id == $user->user_id))))
-    <form action="/updateEvent" method="POST">
+    @foreach($eventImages as $image)
+        <form action="/deleteEventImage" method="POST">
+        @csrf
+        <input type="hidden" name="event_id" value="{{$event->id}}">
+        <input type="hidden" name="image_id" value="{{$image->image_id}}">    
+        <img src="{{asset('storage')}}/{{$image->image_name}}" height=150px>
+        <input type="submit" value="Удалить">
+        </form>
+    @endforeach     
+    <form enctype="multipart/form-data" action="/updateEvent" method="POST">
     @csrf
-    <input type="hidden" name="event_id" value="{{$event->id}}">    
+    <input  type="hidden" name="event_id" value="{{$event->id}}">    
     <p> Название события: <input type="text" size=50 name="eventName" value="{{$event->eventName}}"> </p>
     <p>Описание события:</p>
-    <textarea name="eventDescription" cols="50" rows="10">{{$event->eventDescription}}</textarea>     
+    <textarea name="eventDescription" cols="50" rows="10">{{$event->eventDescription}}</textarea> <br>   
     <p> Долгота: <input size=10 type="number" step="any" name="longitude" value="{{$event->longitude}}"> </p>
     <p> Широта: <input size=10 type="number" step="any" name="latitude" value="{{$event->latitude}}"> </p>       
     <p>Категория события: <select name = "category_id">
@@ -27,8 +34,12 @@
             <option @if($category->id ==  $event->category_id) selected @endif value="{{ $category->id }}">{{ $category->categoryName }}</option>
         @endforeach
         </select></p>
+        <p>Изображения</p>
+        <input multiple type="file" name="images[]" accept="image/*">
+        <br><br><br>
     <button type="submit"> Обновить информацию о событии </button>
     </form>
+    
 
     <br> 
     @if ($authUser->levelRights > 1)
@@ -51,6 +62,9 @@
     <p> Название события: {{$event->eventName}} </p>
     <p> Статус события: {{$event->statusName}} </p>
     <p> Описание события: {{$event->eventDescription}} </p>
+        @foreach($eventImages as $image)   
+            <img src="{{asset('storage')}}/{{$image->image_name}}" height=150px>
+        @endforeach  
     <p> Долгота: {{$event->longitude}} </p>
     <p> Широта: {{$event->latitude}} </p>    
 @endif
