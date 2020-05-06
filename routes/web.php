@@ -14,7 +14,7 @@
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-
+Route::get('/send-email', 'FeedbackController@send');
 
 Route::get('/', function(){
         $images = App\Image::selectImages();
@@ -92,7 +92,7 @@ Route::post('/deleteComment', 'CommentController@deleteComment');
 
 Route::post('/uploadImage', 'ImageController@uploadImage');
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 Route::get('/home', 'HomeController@index')->name('home');
 
