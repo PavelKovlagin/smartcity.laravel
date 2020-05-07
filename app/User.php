@@ -86,6 +86,16 @@ class User extends Authenticatable
         ['code_reset_password' => Hash::make($code_reset_password), 'user_id' => $user_id, 'dateTime' => Carbon::now()->addHour()]);
     }
 
+    protected static function nullifyCodeResetPassword($user_id){
+        DB::update('UPDATE users 
+                SET 
+                    code_reset_password = null,
+                    validity_password_reset_code = null
+                WHERE id = :user_id',
+        ['user_id' => $user_id]);
+    }
+
+
     protected static function updateUser($user_id, $name, $surname, $subname, $date){
         DB::update('UPDATE users 
                 SET name = :name, 

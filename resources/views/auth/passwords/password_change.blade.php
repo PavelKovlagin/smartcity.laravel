@@ -3,7 +3,7 @@
 Восстановаить пароль
 @endsection
 @section('content')
-<p class='error'>{{session('error')}}</p>
+<p class='error'>{{session('message')}}</p>
 <form action='/passwordChange' method="POST">
 @csrf
 <p>E-mail address: <input type="text" name="email" required ></p>

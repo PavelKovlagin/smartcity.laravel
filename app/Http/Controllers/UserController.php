@@ -75,33 +75,33 @@ class UserController extends Controller
         } else {
             $codeResetPassword = random_int(100000, 999999);
             App\User::updateCodeResetPassword($user->user_id, $codeResetPassword);
-            //return redirect('/passwordChange');
-            return back()->with(['error' => 'Код: '.$codeResetPassword]);
+            $to_name = $user->user_name;
+            $to_email = $user->email;
+            $data = array('name'=>$to_name, "body" => "Ваш код для сброса пароля: " . $codeResetPassword);
+            Mail::send('emails/feedback', $data, function($message) use ($to_name, $to_email) {
+                $message->to($to_email, $to_name)->subject('SmartCityVLSU Test');
+                $message->from('SmartCityVLSU@gmail.com','SmartCity');
+            });
+            return redirect('/passwordChange')->with(['message' => 'Пароль отправлен на электронный адрес ' . $user->email]);
         }    
-        // $to_name = 'Something Name';
-        // $to_email = $request->email;
-        // $data = array('name'=>$to_name, "body" => "Hello it's smart city");
-        // Mail::send('emails/feedback', $data, function($message) use ($to_name, $to_email) {
-        //     $message->to($to_email, $to_name)->subject('SmartCityVLSU Test');
-        //     $message->from('SmartCityVLSU@gmail.com','SmartCity');
-        // });
-        // return 'Сообщение отправлено на адрес '. $to_email;
+        
     }     
 
     public function passwordChange(Request $request) {
         $user = App\User::selectUser_email($request->email);
         if ($user == null) {
-            return back()->with('error', 'Пользователь не найден');
+            return back()->with('message', 'Пользователь не найден');
         } else {
             if ((Hash::check($request->code_reset_password, $user->code_reset_password)) AND (Carbon::now() <= $user->validity_password_reset_code)) {
                 if ($request->password == $request->password_confirm){
                     App\User::updatePassword($user->user_id, $request->password);
-                    return back()->with(['error' => 'Получилось, однако']);
+                    App\User::nullifyCodeResetPassword($user->user_id);
+                    return redirect('/login');
                 } else {
-                    return back()->with(['error' => 'Пароли не совпадают']);
+                    return back()->with(['message' => 'Пароли не совпадают']);
                 }
             } else {
-                return back()->with(['error' => 'Неверный либо просроченый код сбоса пароля']);
+                return back()->with(['message' => 'Неверный либо просроченый код сбоса пароля']);
             }      
         } 
     }
