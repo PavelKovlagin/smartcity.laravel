@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Laravel\Passport\HasApiTokens;
@@ -36,10 +37,19 @@ class User extends Authenticatable
             'blockDate',
             'roles.id as role_id',
             'roles.name as role_name',
+            'code_reset_password',
+            'validity_password_reset_code',
             'levelRights',
             'notRemove',
         );
         return $users;
+    }
+
+    protected static function selectUser_email($email){
+        $user = User::selectUsers()
+        ->where('email', '=', $email)
+        ->first();
+        return $user;
     }
 
     protected static function selectUser($user_id) {
@@ -67,6 +77,15 @@ class User extends Authenticatable
         ['blockDate' => $blockDate, 'user_id' => $user_id]);
     }
 
+    protected static function updateCodeResetPassword($user_id, $code_reset_password){
+        DB::update('UPDATE users 
+                SET 
+                    code_reset_password = :code_reset_password,
+                    validity_password_reset_code = :dateTime
+                WHERE id = :user_id',
+        ['code_reset_password' => Hash::make($code_reset_password), 'user_id' => $user_id, 'dateTime' => Carbon::now()->addHour()]);
+    }
+
     protected static function updateUser($user_id, $name, $surname, $subname, $date){
         DB::update('UPDATE users 
                 SET name = :name, 
@@ -84,6 +103,11 @@ class User extends Authenticatable
     protected static function updateRole($user_id, $role_id){
         DB::update('update users set role_id = :role_id WHERE id = :user_id', 
         ['role_id' => $role_id, 'user_id' => $user_id]);
+    }
+
+    protected static function updatePassword($user_id, $password){
+        DB::update('update users set password = :password WHERE id = :user_id', 
+        ['password' => Hash::make($password), 'user_id' => $user_id]);
     }
 
     /**

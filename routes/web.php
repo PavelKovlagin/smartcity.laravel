@@ -21,6 +21,20 @@ Route::get('/', function(){
         return view('welcome');
 });
 
+//работа с пользователями
+
+Route::get('/resetPassword', function(){
+        return view('auth.passwords.reset');
+});
+
+Route::post('/sendCode', 'UserController@sendCode');
+
+Route::get('/passwordChange', function(){
+        return view('auth.passwords.password_change');
+});
+
+Route::post('/passwordChange', 'UserController@passwordChange');
+
 Route::get('/users', 'UserController@showUsers');
 
 Route::get('/users/user/{user_id}', 'UserController@showUser');
@@ -92,7 +106,9 @@ Route::post('/deleteComment', 'CommentController@deleteComment');
 
 Route::post('/uploadImage', 'ImageController@uploadImage');
 
-Auth::routes(['verify' => true]);
+Auth::routes(['register' => true,
+        'verify' => false,
+        'reset' => false]);
 
 Route::get('/home', 'HomeController@index')->name('home');
 
