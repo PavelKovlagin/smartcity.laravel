@@ -71,7 +71,7 @@ class RegisterController extends Controller
             'subname' => $data['subname'],
             'date' => $data['date'],
             'email' => $data['email'],
-            'role_id' => "1",
+            'role_id' => "3",
             'password' => Hash::make($data['password']),
         ]);
     }
@@ -93,7 +93,7 @@ class RegisterController extends Controller
 
          $input = $request->all();
          $input['password'] = bcrypt($input['password']);
-         $input['role'] = "user";
+         $input['role_id'] = 3;
          $user = User::create($input);
          $success['token'] = $user->createToken('MyApp')->accessToken;
          $success['name'] = $user->name;

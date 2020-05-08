@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use DB;
 use App;
@@ -11,29 +12,29 @@ use App;
 class EventController extends Controller
 {
 
-    public function apiSelectEvents(){
-        if (!request()->has('dateChange')) return "false";
-        $dateChange = request('dateChange');
+    public function apiSelectEvents(){   
+        $dateChange = request('dateChange');     
         if (preg_match("/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/", $dateChange)) {
-        $events = App\Event::selectEventsDateChange($dateChange)->get();
-        foreach ($events as $event) {
-            //if ($authUser->user_id <> $event->user_id)
-            if ($event->visibilityForUser == 0) {
-                $event->eventName = "";
-                $event->eventDescription = "";
+            $dateChange = request('dateChange');
+            $events = App\Event::selectEventsDateChange($dateChange)->get();
+            foreach ($events as $event) {
+                //if ($authUser->user_id <> $event->user_id)
+                if ($event->visibilityForUser == 0) {
+                    $event->eventName = "";
+                    $event->eventDescription = "";
+                }
             }
-        }
-        return $events;
+            return $this->sendResponse($events, count($events));
         } else {
-            return "false";  
+            return $this->sendError('Error load', 'Error load', 200);;  
         }
     }
 
     public function apiSelectEvent() {
         if (!request()->has('event_id')) return "false";
         $event_id = request('event_id');
-        $event = App\Event::selectEvent($event_id)->get();
-        return $event;
+        $event = App\Event::selectEvent($event_id);
+        return $this->sendResponse($event, $event->eventName);
     }
 
     public function apiAddEvent(Request $request) {
@@ -44,9 +45,10 @@ class EventController extends Controller
             "latitude" => "required|numeric"
         ]);
         if ($validator->fails()) {
-            return $this->sendError('Error adding event.', $validator->errors());
+            return $this->sendError('Error adding event.', $validator->errors(), 404);
         }
-        App\Event::insertEvent(\Auth::id(), $request);
+        $event_id = App\Event::insertEvent(Auth::id(), $request);
+        App\EventImage::insertEventImages($request->images, $event_id, Auth::id()); 
         return $this->sendResponse($request->all(), 'Event added.');
     }
 
@@ -65,6 +67,7 @@ class EventController extends Controller
         $authUser = App\User::selectAuthUser();
         $event = App\Event::selectEvent($request->event_id);
         $user = App\User::selectUser($event->user_id);
+        return dd($request->images);
         if (($authUser<>false) 
             AND (($authUser->levelRights > $user->levelRights)
                 OR (($authUser->user_id == $user->user_id) AND ($event->status_id == 1 OR $authUser->levelRights > 1)))) {

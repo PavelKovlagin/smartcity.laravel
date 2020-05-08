@@ -120,6 +120,19 @@ class User extends Authenticatable
         ['password' => Hash::make($password), 'user_id' => $user_id]);
     }
 
+    protected static function selectOauthClient(){
+        $oauth_client = DB::table('oauth_clients')
+        ->select(
+            'id',
+            'user_id',
+            'name',
+            'secret',
+            'redirect')
+        ->where('name', '=', 'Laravel Password Grant Client')
+        ->first();
+        return $oauth_client;
+    }
+
     /**
      * The attributes that should be hidden for arrays.
      *

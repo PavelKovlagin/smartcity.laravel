@@ -17,8 +17,8 @@ class StatusController extends Controller
     }
 
     public function apiSelectStatuses() {
-        $statuses = App\Status::selectVisibilityStatuses();
-        return $statuses;
+        $statuses = App\Status::selectVisibilityStatuses()->get();
+        return $this->sendResponse($statuses, count($statuses));
     }
 
     public function showStatus($status_id) {

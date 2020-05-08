@@ -21,7 +21,7 @@
         <input type="submit" value="Удалить">
         </form>
     @endforeach     
-    <form enctype="multipart/form-data" action="/updateEvent" method="POST">
+    <form  action="/updateEvent" method="POST">
     @csrf
     <input  type="hidden" name="event_id" value="{{$event->id}}">    
     <p> Название события: <input type="text" size=50 name="eventName" value="{{$event->eventName}}"> </p>
@@ -73,9 +73,11 @@
 <script type="text/javascript">
 var longitude = {{$event->longitude}};
 var latitude = {{$event->latitude}};
+var myPositionLatitude;
+var myPositionLongitude;
         // Как только будет загружен API и готов DOM, выполняем инициализацию
         ymaps.ready(init);
- 
+
         function init () {
             // Создание экземпляра карты и его привязка к контейнеру с
             // заданным id ("map")
@@ -88,17 +90,20 @@ var latitude = {{$event->latitude}};
  
 			// Создание метки 
 			var myPlacemark = new ymaps.Placemark(
-                
 			// Координаты метки
 			[latitude, longitude]        
 			);
+
+            var myPosition = new ymaps.Placemark(
+                [myPositionLatitude, myPositionLongitude]
+            );
  
-		// Добавление метки на карту
-		myMap.geoObjects.add(myPlacemark);
- 
+		    // Добавление метки на карту
+		    myMap.geoObjects.add(myPlacemark);     
  
         }
     </script>
+
     <div id="map" style="width:600px; height:400px"></div>
     <br>
 

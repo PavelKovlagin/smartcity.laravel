@@ -60,8 +60,8 @@ class Event extends Model
     protected static function selectEvent($event_id) {
         $event = Event::selectEvents()
         ->where('events.id', '=', $event_id)
-        ->get();
-        return $event[0];
+        ->first();
+        return $event;
     }  
 
     protected static function changeCategory($currentCategory_id){

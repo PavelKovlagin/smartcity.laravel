@@ -14,8 +14,6 @@
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-Route::get('/send-email', 'FeedbackController@send');
-
 Route::get('/', function(){
         $images = App\Image::selectImages();
         return view('welcome');

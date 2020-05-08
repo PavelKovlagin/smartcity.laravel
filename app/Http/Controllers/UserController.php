@@ -105,4 +105,9 @@ class UserController extends Controller
             }      
         } 
     }
+
+    public function apiGetClientAuthentication(){
+        return $this->sendResponse(App\User::selectOauthClient(), 'OauthClient');
+
+    }
 }
