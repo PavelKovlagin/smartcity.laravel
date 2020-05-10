@@ -77,7 +77,9 @@ Route::post('/addCategory', 'CategoryController@addCategory');
 Route::get('/events', 'EventController@showEvents');
 
 Route::get('/events/addEvent', function(){
-        return view('events.addEvent', ['authUser' => App\User::selectAuthUser()]);
+        return view('events.addEvent', 
+        ['authUser' => App\User::selectAuthUser(),
+        'categories' => App\Category::selectCategories()->get()]);
 });
 
 Route::post('/updateEvent', 'EventController@updateEvent');

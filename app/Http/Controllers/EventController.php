@@ -53,7 +53,7 @@ class EventController extends Controller
             "eventDescription" => "required",
             "longitude" => "required|numeric",
             "latitude" => "required|numeric",
-            "caterogy_id" => "required"
+            "category_id" => "required"
         ]);
         if ($validator->fails()) {
             return $this->sendError('Error update event. Validation failed', $validator->errors(), 418);

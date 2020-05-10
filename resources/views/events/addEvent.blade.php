@@ -12,6 +12,11 @@
         <input type="text" name="eventName">
         <p> Описание события:</p>
         <textarea type="text" name="eventDescription"></textarea>
+        <p>Категория события: <select name = "category_id">
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}">{{ $category->categoryName }}</option>
+        @endforeach
+        </select></p>
         <p> Долгота: </p>
         <input type="number" step="any" name="longitude">
         <p> Широта:</p>

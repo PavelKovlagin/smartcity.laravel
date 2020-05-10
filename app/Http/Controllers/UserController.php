@@ -13,9 +13,12 @@ use App;
 class UserController extends Controller
 {
     public function showUser($user_id) {
-        $authUser = App\User::selectAuthUser();
         $user = App\User::selectUser($user_id);
-        $roles = App\Role::selectRolesWithLevelRights($authUser->levelRights);
+        if ($authUser = App\User::selectAuthUser() <> false) {
+            $roles = App\Role::selectRolesWithLevelRights($authUser->levelRights);
+        } else {
+            $roles = [];
+        }        
         return view("users.user", [
             'roles' => $roles,
             'authUser' => $authUser,
