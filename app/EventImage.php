@@ -12,12 +12,15 @@ class EventImage extends Model
     public static function selectEventImages($event_id) {
         $eventImages = DB::table('event_images')
         ->join('images', 'images.id', '=', 'image_id')
+        ->join('users', 'users.id', '=', 'user_id')
+        ->join('roles', "roles.id", "=", "users.role_id")
         ->where("event_id", "=", $event_id)
         ->select(
             'images.id as image_id', 
             'event_id', 
             'images.name as image_name',
-            'user_id',
+            'users.id as user_id',
+            'roles.levelRights as user_levelRights'
         );
         return $eventImages;
     }

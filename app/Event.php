@@ -81,14 +81,20 @@ class Event extends Model
     }
 
     protected static function updateEvent($request) {
-        DB::table('events')
-        ->where('events.id', '=', $request->event_id)
-        ->update(array('eventName' => $request->eventName, 
-                        'eventDescription' => $request->eventDescription,
-                        'longitude' => $request->longitude,
-                        'latitude'=>$request->latitude,
-                        'category_id' => $request->category_id,
-                        'dateChange' => Carbon::now()));
+        $category = Category::selectCategory($request->category_id);
+        if ($category <> null) {
+            DB::table('events')
+            ->where('events.id', '=', $request->event_id)
+            ->update(array('eventName' => $request->eventName, 
+                            'eventDescription' => $request->eventDescription,
+                            'longitude' => $request->longitude,
+                            'latitude'=>$request->latitude,
+                            'category_id' => $request->category_id,
+                            'dateChange' => Carbon::now()));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     protected static function updateEventStatus($event_id, $status_id) {
@@ -99,6 +105,7 @@ class Event extends Model
     }
 
     protected static function insertEvent($user_id, $request) {
+        if (Category::selectCategory($request->category_id)<>null){
             $event = new \App\Event;
             $event->user_id = $user_id;
             $event->eventName = $request->eventName;
@@ -106,9 +113,13 @@ class Event extends Model
             $event->longitude = $request->longitude;
             $event->latitude = $request->latitude;
             $event->status_id = 1;
+            $event->category_id = $request->category_id;
             $event->date = Carbon::now();
             $event->dateChange = Carbon::now();
             $event->save();
             return $event->id;
+        } else {
+            return false;
+        }
     }
 }

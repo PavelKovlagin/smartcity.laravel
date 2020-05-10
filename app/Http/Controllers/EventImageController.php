@@ -18,10 +18,8 @@ class EventImageController extends Controller
             if ($authUser <> false
                 AND (($authUser->levelRights > $user->levelRights)
                     OR ($authUser->user_id == $user->user_id)))
-            App\EventImage::destroy($request->image_id); 
+            App\EventImage::destroy($request->image_id);
             return back();
-        }
-        
+        }        
     }
-
 }

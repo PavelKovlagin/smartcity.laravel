@@ -23,6 +23,8 @@ Route::middleware("auth:api")->post('/addComment', 'CommentController@apiAddComm
 
 Route::middleware('auth:api')->post('/addEvent', 'EventController@apiAddEvent');
 
+Route::middleware('auth:api')->post('/updateEvent', 'EventController@apiUpdateEvent');
+
 Route::post('/register', 'Auth\RegisterController@apiRegister');
 
 Route::get('/events', 'EventController@apiSelectEvents');
@@ -32,3 +34,5 @@ Route::get('/eventComments', 'CommentController@apiSelectComments');
 Route::get("/event", 'EventController@apiSelectEvent');
 
 Route::get('/statuses', 'StatusController@apiSelectStatuses');
+
+Route::get('/categories', 'CategoryController@apiSelectCategories');

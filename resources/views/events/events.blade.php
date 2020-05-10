@@ -56,7 +56,6 @@
         </tr>
         @endforeach
     </table>
-    {{$events->links('pagination.pagination')}}
     @else
     <h1>Событий нет</h1>
     @endif

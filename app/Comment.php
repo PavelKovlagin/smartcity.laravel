@@ -46,11 +46,18 @@ class Comment extends Model
     }
 
     protected static function addComment($request, $user_id) {
-        $comment = new \App\Comment;
-        $comment->user_id = $user_id;
-        $comment->event_id = $request->event_id;
-        $comment->text = $request->comment;
-        $comment->dateTime = Carbon::now();
-        $comment->save();
+        if (Comment::selectComment($request->event_id) <> null) {
+            $comment = new \App\Comment;
+            $comment->user_id = $user_id;
+            $comment->event_id = $request->event_id;
+            $comment->text = $request->comment;
+            $comment->dateTime = Carbon::now();
+            $comment->save();
+            return true;
+        } else {
+            return false;
+        }
+
+        
     }
 }

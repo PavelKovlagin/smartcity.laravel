@@ -20,8 +20,8 @@ class CategoryController extends Controller
     }
 
     public function apiSelectCategories() {
-        $categories = App\Category::selectCategories();
-        return $categories;
+        $categories = App\Category::selectCategories()->get();
+        return $this->sendResponse($categories, count($categories));
     }
 
     public function showCategory($category_id) {

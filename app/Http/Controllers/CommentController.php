@@ -19,17 +19,23 @@ class CommentController extends Controller
     }
 
     public function apiAddComment(Request $request) {
-        if (Auth::user() -> blockDate < Carbon::now()){
-            $validator = Validator::make($request->all(), [
-                "comment" => "required",
-            ]);
-            if ($validator->fails()) {
-                return $this->sendError('Error adding event.', $validator->errors());
-            }
-            \App\Comment::addComment($request, \Auth::id());
-            return $this->sendResponse($request->all(), 'Comment added.');
+        $validator = Validator::make($request->all(), [
+            "comment" => "required",
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Error adding event.', $validator->errors(), 419);
+        }
+        $authUser = App\User::selectAuthUser();
+        if ($authUser<>false){
+            if ($authUser->blocked == false) {
+                if (\App\Comment::addComment($request, \Auth::id())) {
+                    return $this->sendResponse($request->all(), 'Comment added.');
+                } else {
+                    return $this->sendError($request->all(), 'Event not founded', 419);
+                }
+            } else return $this->sendError($request->all(), 'User blocked.', 419);
         } else {
-            return $this->sendError($request->all(), 'Comment not added.', 200);
+            return $this->sendError($request->all(), 'User not authorization.', 419);
         }
     }
 

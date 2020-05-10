@@ -34,7 +34,17 @@ class EventController extends Controller
         if (!request()->has('event_id')) return "false";
         $event_id = request('event_id');
         $event = App\Event::selectEvent($event_id);
-        return $this->sendResponse($event, $event->eventName);
+        $images = App\EventImage::selectEventImages($event_id)->get();
+        $comments = \App\Comment::selectCommentsFromEvent($event_id)->get();
+        return $this->sendResponse(['event' => $event, 'images' => $images, 'comments' => $comments], $event->eventName);
+    }
+
+    public function apiSelectEventImages() {
+        if (!request()->has('event_id')) return "false";
+        $event_id = request('event_id');
+        $event = App\Event::selectEvent($event_id);
+        $images = App\EventImage::selectEventImages($event_id)->get();
+        return $this->sendResponse($images, $event->eventName);
     }
 
     public function apiAddEvent(Request $request) {
@@ -42,14 +52,52 @@ class EventController extends Controller
             "eventName" => "required",
             "eventDescription" => "required",
             "longitude" => "required|numeric",
-            "latitude" => "required|numeric"
+            "latitude" => "required|numeric",
+            "caterogy_id" => "required"
         ]);
         if ($validator->fails()) {
-            return $this->sendError('Error adding event.', $validator->errors(), 404);
+            return $this->sendError('Error update event. Validation failed', $validator->errors(), 418);
         }
-        $event_id = App\Event::insertEvent(Auth::id(), $request);
-        App\EventImage::insertEventImages($request->images, $event_id, Auth::id()); 
-        return $this->sendResponse($request->all(), 'Event added.');
+        $authUser = App\User::selectAuthUser();
+        if ($authUser<>false AND $authUser->blocked == false) {
+            if ($event_id = App\Event::insertEvent(Auth::id(), $request) <> false) {
+                App\EventImage::insertEventImages($request->images, $event_id, Auth::id()); 
+                return $this->sendResponse($request->all(), 'Event added.');
+            } else {
+                return $this->sendError($request->all(), 'Event not added.', 418);
+            }            
+        } else {
+            return $this->sendError($request->all(), 'User blocked.', 418);
+        }
+    }
+
+    public function apiUpdateEvent(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'event_id' => "required",
+            "eventName" => "required",
+            "eventDescription" => "required",
+            "longitude" => "required|numeric",
+            "latitude" => "required|numeric",
+            "category_id" => "required"
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Error adding event.', $validator->errors(), 418);
+        }
+        $authUser = App\User::selectAuthUser();
+        $event = App\Event::selectEvent($request->event_id);
+        if (!$authUser) {
+            return $this->sendError($request->all(), 'Authorization failed.', 418);
+        }
+        if ($authUser->user_id <> $event->user_id) {
+            return $this->sendError($request->all(), "It's not your event. Go away", 418);
+        }
+        if($event->status_id <> 1) {
+            return $this->sendError($request->all(), 'Event have other status. Too late', 418);
+        }
+        if (!App\Event::updateEvent($request)) {
+            return $this->sendError($request->all(), 'Event not update.', 418);
+        }
+        return $this->sendResponse($request->all(), 'Event update.');
     }
 
     public function addEvent(Request $request){
@@ -67,7 +115,6 @@ class EventController extends Controller
         $authUser = App\User::selectAuthUser();
         $event = App\Event::selectEvent($request->event_id);
         $user = App\User::selectUser($event->user_id);
-        return dd($request->images);
         if (($authUser<>false) 
             AND (($authUser->levelRights > $user->levelRights)
                 OR (($authUser->user_id == $user->user_id) AND ($event->status_id == 1 OR $authUser->levelRights > 1)))) {
@@ -107,7 +154,7 @@ class EventController extends Controller
         if ((request()->has('category_id')) AND ((request('category_id') <> 0))){
             $events = $events -> where('category_id', '=', request('category_id'));
         }
-        $events = $events->paginate(10);
+        $events = $events->get();
 
         return view('events.events', [
             'user_id' => request('user_id'),
@@ -147,16 +194,6 @@ class EventController extends Controller
             OR ($authUser->user_id == $request->user_id))){
             App\Event::updateEventStatus($request->event_id, $request->status_id);
             return back();
-        }
-    }
-
-    public function deleteEvent($event_id){
-
-        if ((Auth::check()) and (Auth::user() -> role = "admin")) {
-            App\Event::destroy($event_id);
-            return redirect("/events");
-        } else {
-            return redirect("/");
         }
     }
 }

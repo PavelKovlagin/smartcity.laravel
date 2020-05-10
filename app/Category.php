@@ -16,6 +16,13 @@ class Category extends Model
         return $categories;
     }
 
+    protected static function selectCategory($category_id) {
+        $category = Category::selectCategories()
+        ->where("id", "=", $category_id)
+        ->first();
+        return $category;
+    }
+
     protected static function insertCategory($request) {
         $category = new \App\Category;
         $category->categoryName = $request->categoryName;

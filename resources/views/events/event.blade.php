@@ -13,15 +13,19 @@
     AND (($event->user_id == $authUser -> user_id) AND ($event->status_id == 1)
     OR ($authUser->levelRights > 1) AND (($authUser->levelRights > $user->levelRights) OR ($authUser->user_id == $user->user_id))))
     @foreach($eventImages as $image)
-        <form action="/deleteEventImage" method="POST">
-        @csrf
-        <input type="hidden" name="event_id" value="{{$event->id}}">
-        <input type="hidden" name="image_id" value="{{$image->image_id}}">    
-        <img src="{{asset('storage')}}/{{$image->image_name}}" height=150px>
-        <input type="submit" value="Удалить">
-        </form>
+        @if ($authUser->levelRights >= $image->user_levelRights)
+            <form action="/deleteEventImage" method="POST">
+            @csrf
+            <input type="hidden" name="event_id" value="{{$event->id}}">
+            <input type="hidden" name="image_id" value="{{$image->image_id}}">    
+            <p><img src="{{asset('storage')}}/{{$image->image_name}}" height=150px></p> 
+            <input type="submit" value="Удалить">
+            </form>
+        @else
+            <p><img src="{{asset('storage')}}/{{$image->image_name}}" height=150px></p>
+        @endif
     @endforeach     
-    <form  action="/updateEvent" method="POST">
+    <form enctype="multipart/form-data" action="/updateEvent" method="POST">
     @csrf
     <input  type="hidden" name="event_id" value="{{$event->id}}">    
     <p> Название события: <input type="text" size=50 name="eventName" value="{{$event->eventName}}"> </p>
