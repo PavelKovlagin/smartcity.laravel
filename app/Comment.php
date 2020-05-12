@@ -16,7 +16,6 @@ class Comment extends Model
                     ->select(
                 'comments.id',
                 'comments.user_id',
-                'role_id',
                 'roles.levelRights as user_levelRights',
                 'email',
                 'text',
@@ -46,7 +45,7 @@ class Comment extends Model
     }
 
     protected static function addComment($request, $user_id) {
-        if (Comment::selectComment($request->event_id) <> null) {
+        if (Event::selectEvent($request->event_id) <> null) {
             $comment = new \App\Comment;
             $comment->user_id = $user_id;
             $comment->event_id = $request->event_id;

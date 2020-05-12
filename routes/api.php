@@ -19,11 +19,17 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/getOauthClient', 'UserController@apiGetClientAuthentication');
 
+Route::post('/sendCode', 'UserController@apiSendCode');
+
+Route::post("/passwordChange", "UserController@apiPasswordChange");
+
 Route::middleware("auth:api")->post('/addComment', 'CommentController@apiAddComment');
 
 Route::middleware('auth:api')->post('/addEvent', 'EventController@apiAddEvent');
 
 Route::middleware('auth:api')->post('/updateEvent', 'EventController@apiUpdateEvent');
+
+Route::middleware('auth:api')->post('/updateUser', 'UserController@apiUpdateUser');
 
 Route::post('/register', 'Auth\RegisterController@apiRegister');
 

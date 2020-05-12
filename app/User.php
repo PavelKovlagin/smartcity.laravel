@@ -24,6 +24,24 @@ class User extends Authenticatable
         'name', 'surname', 'subname', 'date', 'role_id', 'email', 'password', 
     ];
 
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'code_reset_password', 'validity_password_reset_code', 'email_verified_at', 'created_at', 'updated_at', 'password', 'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
     protected static function selectUsers(){
         $users = DB::table('users')
         ->join('roles', 'role_id', '=', 'roles.id')
@@ -84,6 +102,7 @@ class User extends Authenticatable
                     validity_password_reset_code = :dateTime
                 WHERE id = :user_id',
         ['code_reset_password' => Hash::make($code_reset_password), 'user_id' => $user_id, 'dateTime' => Carbon::now()->addHour()]);
+        return true;
     }
 
     protected static function nullifyCodeResetPassword($user_id){
@@ -93,6 +112,7 @@ class User extends Authenticatable
                     validity_password_reset_code = null
                 WHERE id = :user_id',
         ['user_id' => $user_id]);
+        return true;
     }
 
 
@@ -108,6 +128,7 @@ class User extends Authenticatable
             'surname' => $surname,
             'subname' => $subname,
             'date' => $date]);
+            return true;
     }
 
     protected static function updateRole($user_id, $role_id){
@@ -118,6 +139,7 @@ class User extends Authenticatable
     protected static function updatePassword($user_id, $password){
         DB::update('update users set password = :password WHERE id = :user_id', 
         ['password' => Hash::make($password), 'user_id' => $user_id]);
+        return true;
     }
 
     protected static function selectOauthClient(){
@@ -132,22 +154,4 @@ class User extends Authenticatable
         ->first();
         return $oauth_client;
     }
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
 }

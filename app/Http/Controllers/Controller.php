@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 use DB;
 
@@ -30,6 +31,14 @@ class Controller extends BaseController
             'message' => $message,
         ];
         return response()->json($response, $code);
+    }
+
+    public function send($to_name, $to_email, $data) {
+        Mail::send('emails/feedback', $data, function($message) use ($to_name, $to_email) {
+            $message->to($to_email, $to_name)->subject('SmartCityVLSU Test');
+            $message->from('SmartCityVLSU@gmail.com','SmartCity');
+        });
+        return true;
     }
 
     public function checkExistsImages($images){

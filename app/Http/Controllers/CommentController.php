@@ -15,7 +15,7 @@ class CommentController extends Controller
         if(!request()->has('event_id')) return "false";
         $event_id = request('event_id');
         $comments = \App\Comment::selectCommentsFromEvent($event_id)->get();
-        return $comments;
+        return $this->sendResponse($comments, count($comments));
     }
 
     public function apiAddComment(Request $request) {
@@ -44,7 +44,7 @@ class CommentController extends Controller
         if ($authUser<>false) {
             if ($authUser->blocked == false){
                     \App\Comment::addComment($request, Auth::user() -> id);
-                    return redirect("/events/$request->event_id")->with("error", "Сообщение добавилено");
+                    return redirect("/events/$request->event_id")->with("error", "Сообщение добавлено");
                 } else {
                     return redirect("/events/$request->event_id")->with("error", "Вы не можете отправлять сообщения, Ваш профиль заблокирован до " . $authUser->blockDate);           
             } 
