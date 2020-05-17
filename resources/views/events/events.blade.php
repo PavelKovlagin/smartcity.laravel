@@ -4,13 +4,10 @@
 @endsection
 @section('content')
 <h1>{{$title}}</h1>
-
 @if (Auth::check())
-<button type="submit" onclick="location.href='/events/addEvent'">Добавить событие</button>
+    <button type="submit" onclick="location.href='/events/addEvent'">Добавить событие</button>
 @endif
-
-<form action="/events" method="GET">
-    
+<form action="/events" method="GET">    
     <input type='hidden' name='user_id' value={{$user_id}}>
     <p>Статус событий 
     <select name = "status_id">
@@ -19,7 +16,6 @@
         <option @if ($status_id == $status->id) selected @endif value="{{ $status->id }}">{{ $status->statusName }}</option>
     @endforeach
     </select> 
-
     Категория событий 
     <select name = "category_id">
     <option value="0">Все категории</option>
@@ -28,13 +24,9 @@
     @endforeach
     </select>
     <button type="submit">Применить фильтр</button>
-    </p> 
-    
+    </p>     
 </form>
-
-@if(count($events)>0)
-
-    
+@if(count($events)>0)    
     <table border="1">
         <tr>
             <th> Название события </th>

@@ -75,7 +75,7 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
         ]);
     }
-
+    //api регистраиии пользователя
     protected function apiRegister(Request $request) {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',

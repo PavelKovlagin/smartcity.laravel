@@ -15,9 +15,10 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 Route::get('/', function(){
-        $images = App\Image::selectImages();
         return view('welcome');
 });
+
+Route::get('/deleteImagesWithoutLink', 'ImageController@deleteImagesWithoutLink');
 
 //работа с пользователями
 
@@ -100,7 +101,7 @@ Route::post("/deleteEventImage", "EventImageController@deleteEventImage");
 
 Route::post('/addComment', 'CommentController@addComment');
 
-Route::post('/deleteComment', 'CommentController@deleteComment');
+Route::post('/deleteComment', 'CommentController@wedDeleteComment');
 
 //работа с изображениями
 

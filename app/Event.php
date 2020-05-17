@@ -8,6 +8,7 @@ use DB;
 
 class Event extends Model
 {
+    //запрос из базы данных всех событий
     protected static function selectEvents(){
         $events = DB::table('events')
         ->join('users', 'user_id', '=', 'users.id')
@@ -31,39 +32,39 @@ class Event extends Model
             'visibilityForUser');
         return $events;
     }
-
+    //запрос видимых событий
     protected static function selectVisibilityEvents(){
         $events = Event::selectEvents()
         ->where('visibilityForUser', '=', 1);        
         return $events;
     }
-
+    //запрос событий после определенной даты и времени
     protected static function selectEventsDateChange($dateChange) {
         $events = Event::selectEvents()
         ->where('dateChange', '>=', $dateChange);
         return $events;
     }
-
+    //запрос событий пользователя
     protected static function selectUserEvents($user_id) {
         $events = Event::selectEvents()
         ->where('users.id', '=', $user_id);
         return $events;
     }
-
+    //запрос видимых событий пользователя
     public static function selectVisibilityUserEvents($user_id) {
         $events = Event::selectEvents()
         ->where('users.id', '=', $user_id)
         ->where('visibilityForUser', '=', 1);
         return $events;
     }
-
+    //запрос события по идентификатору
     protected static function selectEvent($event_id) {
         $event = Event::selectEvents()
         ->where('events.id', '=', $event_id)
         ->first();
         return $event;
     }  
-
+    //изменение категории для событий определенной категории
     protected static function changeCategory($currentCategory_id){
         $firstCategory_id = Category::selectCategories()->get()[0]->id;
         DB::table('events')
@@ -71,7 +72,7 @@ class Event extends Model
         ->update(array('category_id' => $firstCategory_id,
                         'dateChange' => Carbon::now()));
     }
-
+    //изменение статуса для событий с определенным статусом
     protected static function changeStatus($currentStatus_id){
         $firstStatus_id = Status::selectStatuses()->get()[0]->id;
         DB::table('events')
@@ -79,7 +80,7 @@ class Event extends Model
         ->update(array('status_id' => $firstStatus_id,
                         'dateChange' => Carbon::now()));
     }
-
+    //обновление события
     protected static function updateEvent($request) {
         $category = Category::selectCategory($request->category_id);
         if ($category <> null) {
@@ -96,14 +97,14 @@ class Event extends Model
             return false;
         }
     }
-
+    //обновление статуса события
     protected static function updateEventStatus($event_id, $status_id) {
         DB::table('events')
         ->where('events.id', '=', $event_id)
         ->update(array('status_id' => $status_id, 
                         'dateChange' => Carbon::now()));
     }
-
+    //добавление события
     protected static function insertEvent($user_id, $request) {
         if (Category::selectCategory($request->category_id)<>null){
             $event = new \App\Event;

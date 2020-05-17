@@ -11,13 +11,14 @@ use App;
 
 class CommentController extends Controller
 {
+    //возвращение списка комментариев для события в формате json
     public function apiSelectComments() {
         if(!request()->has('event_id')) return "false";
         $event_id = request('event_id');
         $comments = \App\Comment::selectCommentsFromEvent($event_id)->get();
         return $this->sendResponse($comments, count($comments));
     }
-
+    //API добавления комментария
     public function apiAddComment(Request $request) {
         $validator = Validator::make($request->all(), [
             "comment" => "required",
@@ -38,7 +39,7 @@ class CommentController extends Controller
             return $this->sendError($request->all(), 'User not authorization.', 419);
         }
     }
-
+    //добавление комментария и перенаправление на страницу события с сообщением
     public function addComment(Request $request) {
         $authUser = App\User::selectAuthUser();
         if ($authUser<>false) {
@@ -52,21 +53,51 @@ class CommentController extends Controller
             return redirect("/events/$request->event_id");
         }    
     }
-
+    //удаление комменатия
     public function deleteComment(Request $request){
         $authUser = App\User::selectAuthUser();
         $comment = App\Comment::selectComment($request->comment_id);
         if (empty($comment)){
-            return back()->with("error", "Сообщения не существует");
+            return "Comment not found";
         }  else {
             if (($authUser<>false)
             AND (($authUser->levelRights > $comment->user_levelRights)
             OR ($authUser->user_id == $comment->user_id))){ 
-                App\Comment::destroy($request->comment_id);                            
-                return back()->with("error", "Сообщение удалено");
+                App\Comment::destroy($request->comment_id);   
+                return "Comment deleted" ;                      
             } else {
-                return back()->with("error", "Недостаточно прав для удаления");
+                return "LevelRights fail";                
             }
         }        
+    }
+    //удаление комментария и перенаправление на предыдущую страницу
+    public function wedDeleteComment(Request $request) {
+        $response = $this->deleteComment($request);
+        switch ($response) {
+            case "Comment not found":
+                return back()->with("error", "Сообщения не существует");
+            break;
+            case "Comment deleted":
+                return back()->with("error", "Сообщение удалено");
+            break;
+            case "LevelRights fail":
+                return back()->with("error", "Недостаточно прав для удаления");
+            break;
+        }
+    }
+    //удаление комментария и возвращене ответа в формате json
+    public function apiDeleteComment(Request $request) {
+        $response = $this->deleteComment($request);
+        switch ($response) {
+            case "Comment not found":
+                return $this->sendError($request->all(), "Comment not fount", 418);
+            break;
+            case "Comment deleted":
+                return $this->sendResponse($request->all(), "Comment deleted");
+            break;
+            case "LevelRights fail":
+                return $this->sendError($request->all(), "LevelRights fail", 418);
+            break;
+        }
     }
 }

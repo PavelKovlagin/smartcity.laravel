@@ -8,7 +8,6 @@
 <p> Пользователь: {{$event->email}} </p>
 <p> Дата создания: {{$event->event_date}} </p>
 <p> Дата последнего обновления: {{$event->dateChange}} </p>
-
 @if ($authUser <> false 
     AND (($event->user_id == $authUser -> user_id) AND ($event->status_id == 1)
     OR ($authUser->levelRights > 1) AND (($authUser->levelRights > $user->levelRights) OR ($authUser->user_id == $user->user_id))))
@@ -28,11 +27,11 @@
     <form enctype="multipart/form-data" action="/updateEvent" method="POST">
     @csrf
     <input  type="hidden" name="event_id" value="{{$event->id}}">    
-    <p> Название события: <input type="text" size=50 name="eventName" value="{{$event->eventName}}"> </p>
+    <p> Название события: <input type="text" size=50 name="eventName" value="{{$event->eventName}}" required> </p>
     <p>Описание события:</p>
-    <textarea name="eventDescription" cols="50" rows="10">{{$event->eventDescription}}</textarea> <br>   
-    <p> Долгота: <input size=10 type="number" step="any" name="longitude" value="{{$event->longitude}}"> </p>
-    <p> Широта: <input size=10 type="number" step="any" name="latitude" value="{{$event->latitude}}"> </p>       
+    <textarea required name="eventDescription" cols="50" rows="10">{{$event->eventDescription}}</textarea> <br>   
+    <p> Долгота: <input required size=10 type="number" step="any" name="longitude" value="{{$event->longitude}}"> </p>
+    <p> Широта: <input required size=10 type="number" step="any" name="latitude" value="{{$event->latitude}}"> </p>       
     <p>Категория события: <select name = "category_id">
         @foreach($categories as $category)
             <option @if($category->id ==  $event->category_id) selected @endif value="{{ $category->id }}">{{ $category->categoryName }}</option>
@@ -43,8 +42,6 @@
         <br><br><br>
     <button type="submit"> Обновить информацию о событии </button>
     </form>
-    
-
     <br> 
     @if ($authUser->levelRights > 1)
         <form action="/updateEventStatus" method="POST">
@@ -61,8 +58,7 @@
     @else
         <p>Статус события: {{$event->statusName}}</p>  
     @endif
-
-    @else    
+@else    
     <p> Название события: {{$event->eventName}} </p>
     <p> Статус события: {{$event->statusName}} </p>
     <p> Описание события: {{$event->eventDescription}} </p>
@@ -72,7 +68,6 @@
     <p> Долгота: {{$event->longitude}} </p>
     <p> Широта: {{$event->latitude}} </p>    
 @endif
-
 <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
 <script type="text/javascript">
 var longitude = {{$event->longitude}};
@@ -81,7 +76,6 @@ var myPositionLatitude;
 var myPositionLongitude;
         // Как только будет загружен API и готов DOM, выполняем инициализацию
         ymaps.ready(init);
-
         function init () {
             // Создание экземпляра карты и его привязка к контейнеру с
             // заданным id ("map")
@@ -90,27 +84,22 @@ var myPositionLongitude;
                     // ее центр и коэффициент масштабирования
                     center: [latitude, longitude], // Событие
                     zoom: 13
-                });
- 
+                }); 
 			// Создание метки 
 			var myPlacemark = new ymaps.Placemark(
 			// Координаты метки
 			[latitude, longitude]        
 			);
-
             var myPosition = new ymaps.Placemark(
                 [myPositionLatitude, myPositionLongitude]
-            );
- 
+            ); 
 		    // Добавление метки на карту
-		    myMap.geoObjects.add(myPlacemark);     
- 
+		    myMap.geoObjects.add(myPlacemark);  
         }
     </script>
 
     <div id="map" style="width:600px; height:400px"></div>
     <br>
-
     @if($authUser <> false)
         <form action="{{ url('/addComment') }}" method="POST">
         @csrf
@@ -120,7 +109,6 @@ var myPositionLongitude;
         <button type="submit"> Отправить </button>
         </form>
     @endif
-
     @foreach ($comments as $comment)
     <p> <a href="/users/user/{{$comment->user_id}}">{{$comment->email}}</a> {{$comment->dateTime}}</p>
     <p>{{$comment->text}}</p>

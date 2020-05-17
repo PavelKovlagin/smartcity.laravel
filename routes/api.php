@@ -13,9 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::middleware('auth:api')->get('/user', "UserController@apiSelectUser");
 
 Route::get('/getOauthClient', 'UserController@apiGetClientAuthentication');
 
@@ -24,6 +22,10 @@ Route::post('/sendCode', 'UserController@apiSendCode');
 Route::post("/passwordChange", "UserController@apiPasswordChange");
 
 Route::middleware("auth:api")->post('/addComment', 'CommentController@apiAddComment');
+
+Route::middleware("auth:api")->post('/deleteComment', 'CommentController@apiDeleteComment');
+
+Route::middleware("auth:api")->post('/deleteEventImage', 'EventImageController@apideleteEventImage');
 
 Route::middleware('auth:api')->post('/addEvent', 'EventController@apiAddEvent');
 

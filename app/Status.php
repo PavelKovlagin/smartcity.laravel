@@ -8,6 +8,7 @@ use DB;
 
 class Status extends Model
 {
+    //запрос всех статусов
     protected static function selectStatuses(){
         $statuses = DB::table('statuses')
         ->select(
@@ -17,13 +18,13 @@ class Status extends Model
             'visibilityForUser');
         return $statuses;
     }
-
+    //запрос видимых статусов
     protected static function selectVisibilityStatuses() {
         $statuses = Status::selectStatuses()
         ->where("visibilityForUser", "=", 1);
         return $statuses;
     }
-
+    //добавление нового статуса
     protected static function insertStatus($request) {
         $status = new \App\Status;
         $status->statusName = $request->statusName;
@@ -31,7 +32,7 @@ class Status extends Model
         $status->visibilityForUser = $request->visibilityForUser;
         $status->save();
     }
-
+    //обновление статуса
     protected static function updateStatus($request) {
         DB::table('statuses')
         ->where('id', '=', $request->status_id)

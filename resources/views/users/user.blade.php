@@ -3,7 +3,6 @@
 {{$user->surname}} {{$user->user_name}} {{$user->subname}}
 @endsection
 @section('content')
-
     @if ($authUser <> false
         AND (($user->user_id == $authUser->user_id)
         OR ($authUser->levelRights > 1 AND $authUser->levelRights > $user->levelRights))) 
@@ -20,12 +19,9 @@
     <p> Дата рождения: <input type="date" name="date" value="{{$user->date}}">  </p>
     <button type="submit"> Редактировать профиль </button>
     </form>
-
     <p> Роль: {{$user->role_name}} </p>
     <p> Email: {{$user->email}} </p>
-
         @if(($user->user_id <> $authUser->user_id))
-
             @if($authUser->levelRights == 3)
             <form action="{{ url('/updateRole') }}" method="POST">
                 @csrf

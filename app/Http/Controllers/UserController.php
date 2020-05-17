@@ -13,6 +13,7 @@ use App;
 
 class UserController extends Controller
 {
+    //передача данных и открытие страницы с информацией о пользователе
     public function showUser($user_id) {
         $user = App\User::selectUser($user_id);
         $authUser = App\User::selectAuthUser();
@@ -26,7 +27,7 @@ class UserController extends Controller
             'authUser' => $authUser,
             'user' => $user]);
     }
-
+    //передача данных и открытие страницы со списком всех пользователей
     public function showUsers(){
         $users = App\User::selectUsers()->paginate(10);
         $authUser = App\User::selectAuthUser(); 
@@ -36,12 +37,12 @@ class UserController extends Controller
             'authUser' => $authUser,
             'users' => $users]);
     }
-
+    //блокировка пользователя до определенной даты и перенаправление на страницу со всеми пользователями
     public function blockedUser(Request $request) {
         \App\User::blockedUser($request->user_id, $request->blockDate);
         return redirect("/users");
     }
-
+    //обновление информации о пользователе
     public function updateUser(Request $request){
         $authUser = App\User::selectAuthUser();
         $user = App\User::selectUser($request->user_id);
@@ -56,7 +57,7 @@ class UserController extends Controller
         }
         return redirect("/users/user/$request->user_id");        
     }
-
+    //api обновления информации о пользователе
     public function apiUpdateUser(Request $request) {    
         $validator = Validator::make($request->all(), [
             "user_id" => "required",
@@ -74,23 +75,12 @@ class UserController extends Controller
             return $this->sendError($request->all(), "Failed user update", 419);
         }
     }
-
+    //обновление роли пользователя и перенаправление на страницу пользователя
     public function updateRole(Request $request) {
         \App\User::updateRole($request->user_id, $request->role_id);
         return redirect("/users/user/$request->user_id");
     }
-
-    public function deleteUser(Request $request) {
-        $authUser = App\User::selectAuthUser();
-        $user = App\User::selectUser();
-        if (($authUser <> false) AND ($authUser -> levelRights > 1) AND ($authUser -> levelRights > $user -> levelRights)) {
-            App\User::destroy($request->user_id);
-            return redirect("/users");
-        } else {
-            return redirect("/");
-        }
-    }
-
+    //api отправки кода сброса пароля пользователю
     public function apiSendCode(Request $request) {
         $user = App\User::selectUser_email($request->email);
         if ($user == null) return $this->sendError($request->all(), "User not found", 418);
@@ -103,7 +93,7 @@ class UserController extends Controller
             $this->sendError([], "Reset code not was sent", 418);
         }
     }
-
+    //отправка кода сброса пароля пользователю
     public function sendCode(Request $request) {
         $user = App\User::selectUser_email($request->email);
         if ($user == null){
@@ -116,20 +106,26 @@ class UserController extends Controller
             return redirect('/passwordChange')->with(['message' => 'Код сброса пароля отправлен на электронный адрес ' . $user->email]);
         }            
     }
-    
+    //api изменения пароля
     public function apiPasswordChange(Request $request) {
         $user = App\User::selectUser_email($request->email);
-        if ($user == null) return $this->sendError($request->all(), "User not found", 418);
-        if (!(Hash::check($request->code_reset_password, $user->code_reset_password)) AND !(Carbon::now() <= $user->validity_password_reset_code)) 
-            return  $this->sendError($request->all(), "Invalid or expired password reset code", 418);
-        if ($request->password <> $request->password_confirm) return $this->sendError($request->all(), "Passwords don't match", 418);
+        if ($user == null) return $this->sendError([$request->email], "User not found", 418);
+        if (!(Hash::check($request->code_reset_password, $user->code_reset_password)) OR !(Carbon::now() <= $user->validity_password_reset_code)) 
+            return  $this->sendError([$request->email], "Invalid or expired password reset code", 418);
+        if ($request->password <> $request->password_confirm) return $this->sendError([$request->email], "Passwords don't match", 418);
         if ((App\User::updatePassword($user->user_id, $request->password)) AND (App\User::nullifyCodeResetPassword($user->user_id))) {
-            return $this->sendResponse($request->all(), "Password was change");
+            return $this->sendResponse([$request->email], "Password was change");
         } else {
-            return $this->sendError($request->all(), "Error", 418);
+            return $this->sendError([$request->email], "Error", 418);
         }
     }
-
+    //api запроса пользователя
+    public function apiSelectUser(Request $request){
+        $authUser = App\User::selectAuthUser();
+        if ($authUser == null) return $this->sendError([], "Failed user", 418);
+        return $this->sendResponse($authUser, "User");
+    }
+    //изменение пароля
     public function passwordChange(Request $request) {
         $user = App\User::selectUser_email($request->email);
         if ($user == null) {
@@ -148,9 +144,10 @@ class UserController extends Controller
             }      
         } 
     }
-
+    //api получение ключа клиента
     public function apiGetClientAuthentication(){
-        return $this->sendResponse(App\User::selectOauthClient(), 'OauthClient');
-
+        $oauth_client = App\User::selectOauthClient();
+        if ($oauth_client == null) return $this->sendError([], 'OauthClient null', 418);
+        return $this->sendResponse($oauth_client, "OauthClient");
     }
 }

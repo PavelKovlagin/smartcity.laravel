@@ -11,7 +11,7 @@ use App;
 
 class EventController extends Controller
 {
-
+    //возвращение запроса, после определенной даты, в формате json
     public function apiSelectEvents(){   
         $dateChange = request('dateChange');     
         if (preg_match("/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/", $dateChange)) {
@@ -29,24 +29,16 @@ class EventController extends Controller
             return $this->sendError('Error load', 'Error load', 200);;  
         }
     }
-
+    //возвращает информацию о событии, комментарии и изображения для этого события в формате json
     public function apiSelectEvent() {
-        if (!request()->has('event_id')) return "false";
-        $event_id = request('event_id');
-        $event = App\Event::selectEvent($event_id);
-        $images = App\EventImage::selectEventImages($event_id)->get();
-        $comments = \App\Comment::selectCommentsFromEvent($event_id)->get();
+        if (!request()->has('event_id')) return $this->sendError([], "No event_id", 418);
+        $event = App\Event::selectEvent(request('event_id'));
+        if ($event == null) return $this->sendError([], "Not found event", 418);
+        $images = App\EventImage::selectEventImages($event->id)->get();
+        $comments = \App\Comment::selectCommentsFromEvent($event->id)->get();
         return $this->sendResponse(['event' => $event, 'images' => $images, 'comments' => $comments], $event->eventName);
     }
-
-    public function apiSelectEventImages() {
-        if (!request()->has('event_id')) return "false";
-        $event_id = request('event_id');
-        $event = App\Event::selectEvent($event_id);
-        $images = App\EventImage::selectEventImages($event_id)->get();
-        return $this->sendResponse($images, $event->eventName);
-    }
-
+    //api добавления события
     public function apiAddEvent(Request $request) {
         $validator = Validator::make($request->all(), [
             "eventName" => "required",
@@ -70,7 +62,7 @@ class EventController extends Controller
             return $this->sendError($request->all(), 'User blocked.', 418);
         }
     }
-
+    //api обновления события
     public function apiUpdateEvent(Request $request) {
         $validator = Validator::make($request->all(), [
             'event_id' => "required",
@@ -99,7 +91,7 @@ class EventController extends Controller
         }
         return $this->sendResponse($request->all(), 'Event update.');
     }
-
+    //добавление события и перенаправления на страницу со списком всех событий
     public function addEvent(Request $request){
         $authUser = App\User::selectAuthUser();
         if ($authUser<>false AND $authUser->blocked == false){
@@ -110,7 +102,7 @@ class EventController extends Controller
             return redirect("/events");
         }
     }
-
+    //обновление события и перенаправление на страницу события 
     public function updateEvent(Request $request){
         $authUser = App\User::selectAuthUser();
         $event = App\Event::selectEvent($request->event_id);
@@ -125,7 +117,7 @@ class EventController extends Controller
             return redirect ("/events/$request->event_id");;
         }
     }
-    
+    //передача данных и открытие страницы со списком событий
     public function showEvents(){
         $authUser = App\User::selectAuthUser();
         if (request()->has('user_id') 
@@ -166,7 +158,7 @@ class EventController extends Controller
             'events' => $events,       
         ]);
     }
-
+    //передача данных и открытие страницы определенного события
     public function showEvent($id){
         $authUser = App\User::selectAuthUser();
         $event = App\Event::selectEvent($id);
@@ -185,7 +177,7 @@ class EventController extends Controller
             'eventImages' => $eventImages,
             'categories' => $categories->get()]);
     }
-
+    //обновление статуса события
     public function updateEventStatus(Request $request){
         $authUser = App\User::selectAuthUser();
         $user = App\User::selectUser($request->user_id);        

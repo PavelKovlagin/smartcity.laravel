@@ -41,7 +41,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
+    //запрос всех пользователей
     protected static function selectUsers(){
         $users = DB::table('users')
         ->join('roles', 'role_id', '=', 'roles.id')
@@ -62,14 +62,14 @@ class User extends Authenticatable
         );
         return $users;
     }
-
+    //запрос пользователя по электронному адресу
     protected static function selectUser_email($email){
         $user = User::selectUsers()
         ->where('email', '=', $email)
         ->first();
         return $user;
     }
-
+    //запрос пользователя по идентификатору
     protected static function selectUser($user_id) {
         $user = User::selectUsers()
         ->where('users.id', '=', $user_id)
@@ -81,7 +81,7 @@ class User extends Authenticatable
         }
         return $user;
     }
-
+    //запрос информации об авторизованном пользователе
     protected static function selectAuthUser(){
         if (Auth::check()){
             return User::selectUser(Auth::user()->id);
@@ -89,12 +89,12 @@ class User extends Authenticatable
             return false;
         }
     }
-
+    //блокировка пользователя до определенной даты
     protected static function blockedUser($user_id, $blockDate){
         DB::update('UPDATE users SET blockDate = :blockDate WHERE id = :user_id',
         ['blockDate' => $blockDate, 'user_id' => $user_id]);
     }
-
+    //обновление кода сброса пароля и даты, до которой этот код действует
     protected static function updateCodeResetPassword($user_id, $code_reset_password){
         DB::update('UPDATE users 
                 SET 
@@ -104,7 +104,7 @@ class User extends Authenticatable
         ['code_reset_password' => Hash::make($code_reset_password), 'user_id' => $user_id, 'dateTime' => Carbon::now()->addHour()]);
         return true;
     }
-
+    //обнуление кода сброса пароля и даты, до которой этот код действует
     protected static function nullifyCodeResetPassword($user_id){
         DB::update('UPDATE users 
                 SET 
@@ -114,8 +114,7 @@ class User extends Authenticatable
         ['user_id' => $user_id]);
         return true;
     }
-
-
+    //обновление информации о пользователе
     protected static function updateUser($user_id, $name, $surname, $subname, $date){
         DB::update('UPDATE users 
                 SET name = :name, 
@@ -130,18 +129,18 @@ class User extends Authenticatable
             'date' => $date]);
             return true;
     }
-
+    //обновление роли пользователя
     protected static function updateRole($user_id, $role_id){
         DB::update('update users set role_id = :role_id WHERE id = :user_id', 
         ['role_id' => $role_id, 'user_id' => $user_id]);
     }
-
+    //обновление пароля пользователя
     protected static function updatePassword($user_id, $password){
         DB::update('update users set password = :password WHERE id = :user_id', 
         ['password' => Hash::make($password), 'user_id' => $user_id]);
         return true;
     }
-
+    //запрос ключа для клиента
     protected static function selectOauthClient(){
         $oauth_client = DB::table('oauth_clients')
         ->select(

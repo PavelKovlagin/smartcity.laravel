@@ -11,10 +11,18 @@ use DB;
 
 class ImageController extends Controller
 {
-    private $image_ext = ['jgp', 'jpeg', 'png', 'gif'];
-
-    public function deleteImage($file_name){
-        Storage::delete($file_name);
+    //удаление изображений из файловой системы, если их нет в базе данных
+    public function deleteImagesWithoutLink() {
+        $files = Storage::files('public');
+        $str = "";
+        App\EventImage::selectEventImage_name("no files");
+        foreach($files as $file) {
+            $fileArr = explode("/", $file);
+            if (!App\EventImage::selectEventImage_name($fileArr[1])->exists()){
+                Storage::disk("public")->delete($fileArr[1]);
+            }
+        }
+        return back();
     }
 
     public function uploadImage(Request $request){
@@ -36,8 +44,7 @@ class ImageController extends Controller
                     'public', $image, $currentDate.$i.'.jpg'
                 );
                 $image_id = App\Image::insertImage($currentDate.$i.'.jpg', $authUser->user_id);
-                $stringIDs = $stringIDs . " " . $image_id;
-               
+                $stringIDs = $stringIDs . " " . $image_id;               
             }
             return $stringIDs;         
         }          

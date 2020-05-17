@@ -1,5 +1,4 @@
 @extends('layouts.layout')
-
 @section('content')
 <form method="POST" action="{{ route('register') }}">
     @csrf
@@ -66,6 +65,5 @@
     <button type="submit" class="btn btn-primary">
         Зарегистрироваться
     </button>
-
 </form>
 @endsection

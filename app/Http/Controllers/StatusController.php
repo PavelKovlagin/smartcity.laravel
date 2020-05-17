@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class StatusController extends Controller
 {
+    //передача данных и открытие страницы со списком статусов
     public function showStatuses() {
         $statuses = App\Status::selectStatuses()->paginate(10);
         return view('statuses.statuses', [
@@ -15,12 +16,12 @@ class StatusController extends Controller
             'statuses' => $statuses
         ]);
     }
-
+    //возвращает список видимых статусов в формате json
     public function apiSelectStatuses() {
         $statuses = App\Status::selectVisibilityStatuses()->get();
         return $this->sendResponse($statuses, count($statuses));
     }
-
+    //передача данных и открытие страницы с информацией о статусе
     public function showStatus($status_id) {
         $status = App\Status::find($status_id);
         $authUser = App\User::selectAuthUser();
@@ -29,7 +30,7 @@ class StatusController extends Controller
             'status' => $status
         ]);
     }
-
+    //обновление статуса
     public function updateStatus(Request $request) {
         $authUser = App\User::selectAuthUser();
         if (($authUser<>false) AND ($authUser->levelRights > 2)) {
@@ -39,7 +40,7 @@ class StatusController extends Controller
             return "У вас недостаточно прав";
         }
     }
-
+    //удаление статуса
     public function deleteStatus(Request $request) {
         App\Event::changeStatus($request->status_id);
         $authUser = App\User::selectAuthUser();
@@ -51,7 +52,7 @@ class StatusController extends Controller
             return redirect("/statuses/$request->status_id");
         }
     }
-
+    //добавление статуса
     public function addStatus(Request $request){
         \App\Status::insertStatus($request);
         return redirect("/statuses");

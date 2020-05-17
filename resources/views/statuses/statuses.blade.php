@@ -3,14 +3,11 @@
 {{$title}}
 @endsection
 @section('content')
-
 @if (Auth::check())
 <button type="submit" onclick="location.href='/statuses/addStatus'">Добавить статус</button>
 @endif
-
 @if(count($statuses)>0)
-<h1>{{$title}}</h1>
-    
+<h1>{{$title}}</h1>    
     <table border="1">
         <tr>
             <th> Название статуса </th>

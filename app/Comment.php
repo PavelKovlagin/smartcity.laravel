@@ -8,6 +8,7 @@ use DB;
 
 class Comment extends Model
 {
+    //запрос из базы данных комментарии для определенного события
     protected static function selectCommentsFromEvent($event_id) {
         $comments = DB::table('comments')
                 ->join('events', 'comments.event_id', '=', 'events.id')
@@ -24,7 +25,7 @@ class Comment extends Model
                 ->orderBy('dateTime', 'asc');
         return $comments;
     }
-
+    //запрос комментария по идентификатору
     protected static function selectComment($comment_id) {
         $comments = DB::table('comments')
                     ->join('events', 'comments.event_id', '=', 'events.id')
@@ -43,7 +44,7 @@ class Comment extends Model
                     ->first();
             return $comments;
     }
-
+    //добавление комментария
     protected static function addComment($request, $user_id) {
         if (Event::selectEvent($request->event_id) <> null) {
             $comment = new \App\Comment;
@@ -55,8 +56,6 @@ class Comment extends Model
             return true;
         } else {
             return false;
-        }
-
-        
+        }        
     }
 }

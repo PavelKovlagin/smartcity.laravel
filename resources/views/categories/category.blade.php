@@ -4,7 +4,6 @@
 @endsection
 @section('content')
 @if (($authUser <> false) AND ($authUser->levelRights > 2))
-
     <form action = "{{ url('/updateCategory') }}" method="POST">
     @csrf
     <input type="hidden" name="id" value="{{$category->id}}">
@@ -13,8 +12,7 @@
     <textarea name="categoryDescription">{{$category->categoryDescription}}</textarea>
     <br>
     <button type="submit">Обновить категорию</button>
-    </form>
-    
+    </form>    
     @if ($category->notRemove == 0)        
         <form action="{{ url('/deleteCategory') }}" method="POST">
         @csrf
