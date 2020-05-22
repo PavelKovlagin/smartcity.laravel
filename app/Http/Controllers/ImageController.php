@@ -15,10 +15,9 @@ class ImageController extends Controller
     public function deleteImagesWithoutLink() {
         $files = Storage::files('public');
         $str = "";
-        App\EventImage::selectEventImage_name("no files");
         foreach($files as $file) {
             $fileArr = explode("/", $file);
-            if (!App\EventImage::selectEventImage_name($fileArr[1])->exists()){
+            if ((!App\EventImage::selectEventImage_name($fileArr[1])->exists()) AND (!App\CommentImage::selectCommentImage_name($fileArr[1])->exists())){
                 Storage::disk("public")->delete($fileArr[1]);
             }
         }

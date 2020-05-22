@@ -11,12 +11,12 @@
 @if ($authUser <> false 
     AND (($event->user_id == $authUser -> user_id) AND ($event->status_id == 1)
     OR ($authUser->levelRights > 1) AND (($authUser->levelRights > $user->levelRights) OR ($authUser->user_id == $user->user_id))))
-    @foreach($eventImages as $image)
+    @foreach($event->eventImages as $image)
         @if ($authUser->levelRights >= $image->user_levelRights)
             <form action="/deleteEventImage" method="POST">
             @csrf
             <input type="hidden" name="event_id" value="{{$event->id}}">
-            <input type="hidden" name="image_id" value="{{$image->image_id}}">    
+            <input type="hidden" name="image_id" value="{{$image->id}}">    
             <p><img src="{{asset('storage')}}/{{$image->image_name}}" height=150px></p> 
             <input type="submit" value="Удалить">
             </form>
@@ -101,25 +101,35 @@ var myPositionLongitude;
     <div id="map" style="width:600px; height:400px"></div>
     <br>
     @if($authUser <> false)
-        <form action="{{ url('/addComment') }}" method="POST">
+        <form enctype="multipart/form-data" action="{{ url('/addComment') }}" method="POST">
         @csrf
         <input type="hidden" name="event_id" value="{{$event->id}}">
         <p>Текст комментария:</p>
         <textarea name="comment" cols="50" rows="10"></textarea>
+        <input multiple type="file" name="images[]" accept="image/*">
         <button type="submit"> Отправить </button>
         </form>
     @endif
     @foreach ($comments as $comment)
-    <p> <a href="/users/user/{{$comment->user_id}}">{{$comment->email}}</a> {{$comment->dateTime}}</p>
-    <p>{{$comment->text}}</p>
-    @if (($authUser<>false) 
-        AND (($authUser->levelRights > $comment->user_levelRights)
-        OR ($authUser->user_id == $comment->user_id)))
-        <form action="/deleteComment" method="POST">
-        @csrf
-        <input type='hidden' name='comment_id' value={{$comment->id}}>
-        <button type="submit">Удалить</button>
-        </form>
-    @endif
+        <p> <a href="/users/user/{{$comment->user_id}}">{{$comment->email}}</a> {{$comment->dateTime}}</p>
+        <p>{{$comment->text}}</p>
+        @if (($authUser<>false) 
+            AND (($authUser->levelRights > $comment->user_levelRights)
+            OR ($authUser->user_id == $comment->user_id)))
+            @foreach ($comment->commentImages as $commentImage)
+                <form>
+                <img src="{{asset('storage')}}/{{$commentImage->image_name}}" height=60px>   
+                </form>     
+            @endforeach
+            <form action="/deleteComment" method="POST">
+            @csrf
+            <input type='hidden' name='comment_id' value={{$comment->id}}>
+            <button type="submit">Удалить</button>
+            </form>
+        @else
+            @foreach ($comment->commentImages as $commentImage)
+                <img src="{{asset('storage')}}/{{$commentImage->image_name}}" height=60px>       
+            @endforeach
+        @endif
     @endforeach
 @endsection

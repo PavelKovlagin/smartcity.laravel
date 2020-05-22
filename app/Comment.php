@@ -22,7 +22,11 @@ class Comment extends Model
                 'text',
                 'dateTime')
                 ->where("events.id", $event_id)
-                ->orderBy('dateTime', 'asc');
+                ->orderBy('dateTime', 'asc')->get();
+        foreach($comments as $comment) {
+            $commentImages = Image::checkExistsImages(CommentImage::selectCommentImages($comment->id)->get());
+            $comment->commentImages = $commentImages;
+        }
         return $comments;
     }
     //запрос комментария по идентификатору
@@ -53,9 +57,9 @@ class Comment extends Model
             $comment->text = $request->comment;
             $comment->dateTime = Carbon::now();
             $comment->save();
-            return true;
+            return $comment->id;
         } else {
-            return false;
+            return 0;
         }        
     }
 }

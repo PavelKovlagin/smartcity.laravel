@@ -99,7 +99,7 @@ Route::post("/deleteEventImage", "EventImageController@deleteEventImage");
 
 //работа с комментариями
 
-Route::post('/addComment', 'CommentController@addComment');
+Route::post('/addComment', 'CommentController@webAddComment');
 
 Route::post('/deleteComment', 'CommentController@wedDeleteComment');
 

@@ -16,4 +16,14 @@ class Image extends Model
         $image->save();
         return $image->id;
     }
+
+    public static function checkExistsImages($images){
+        foreach ($images as $key => $image){
+            if (Storage::disk("public")->exists($image->image_name) == false){        
+                unset($images[$key]);        
+                DB::table('images')->where('name', '=', $image->image_name)->delete();
+            }
+        }   
+        return $images;
+    }
 }

@@ -15,44 +15,73 @@ class CommentController extends Controller
     public function apiSelectComments() {
         if(!request()->has('event_id')) return "false";
         $event_id = request('event_id');
-        $comments = \App\Comment::selectCommentsFromEvent($event_id)->get();
+        $comments = \App\Comment::selectCommentsFromEvent($event_id);
         return $this->sendResponse($comments, count($comments));
     }
-    //API добавления комментария
-    public function apiAddComment(Request $request) {
+
+    //добавление комментария и перенаправление на страницу события с сообщением
+    public function addComment(Request $request) {        
         $validator = Validator::make($request->all(), [
             "comment" => "required",
         ]);
-        if ($validator->fails()) {
-            return $this->sendError('Error adding event.', $validator->errors(), 419);
-        }
+        if ($validator->fails()) return array("response" => "Validation failed", "validator" => $validator->errors());
         $authUser = App\User::selectAuthUser();
-        if ($authUser<>false){
-            if ($authUser->blocked == false) {
-                if (\App\Comment::addComment($request, \Auth::id())) {
-                    return $this->sendResponse($request->all(), 'Comment added.');
-                } else {
-                    return $this->sendError($request->all(), 'Event not founded', 419);
-                }
-            } else return $this->sendError($request->all(), 'User blocked.', 419);
+        if ($authUser == false) return array("response" => "User not authorized");
+        if ($authUser->blocked <> false) return array("response" => "User blocked", "dateBlock" => $authUser->blockDate);
+        $comment_id = \App\Comment::addComment($request, Auth::user() -> id);        
+        if ($comment_id > 0) 
+        {
+            App\CommentImage::insertCommentImages($request->images, $comment_id, $authUser->user_id);
+            return array("response" => "Comment added");  
         } else {
-            return $this->sendError($request->all(), 'User not authorization.', 419);
+            return array("response" => "Comment not added");
         }
     }
-    //добавление комментария и перенаправление на страницу события с сообщением
-    public function addComment(Request $request) {
-        $authUser = App\User::selectAuthUser();
-        if ($authUser<>false) {
-            if ($authUser->blocked == false){
-                    \App\Comment::addComment($request, Auth::user() -> id);
-                    return redirect("/events/$request->event_id")->with("error", "Сообщение добавлено");
-                } else {
-                    return redirect("/events/$request->event_id")->with("error", "Вы не можете отправлять сообщения, Ваш профиль заблокирован до " . $authUser->blockDate);           
-            } 
-        } else {
-            return redirect("/events/$request->event_id");
-        }    
+
+    public function webAddComment(Request $request){
+        
+        $response = $this->addComment($request);
+        switch ($response["response"]) {
+            case "Validation failed":
+                return back()->with(["error" => "Валидация не пройдена: " . $response["validator"]]);
+            break;
+            case "User not authorized":
+                return back()->with(["error" => "Пользователь не авторизован"]);
+            break;
+            case "User blocked":
+                return back()->with(["error" => "Пользователь заблокирован до " . $response["dateBlock"]]);
+            break;
+            case "Comment not added":
+                return back()->with(["error" => "Комментарий не добавлен"]);
+            break;
+            case "Comment added":
+                return back()->with(["error" => "Комментарий добавлен"]);
+            break;            
+        }
     }
+
+    //API добавления комментария
+    public function apiAddComment(Request $request) {
+        $response = $this->addComment($request);
+        switch ($response["response"]) {
+            case "Validation failed":
+                return $this->sendError($response["validator"], $response["response"], 418);
+            break;
+            case "User not authorized":
+                return $this->sendError([], $response["response"], 418);
+            break;
+            case "User blocked":
+                return $this->sendError([], $response["response"] . " " . $response["dateBlock"], 418);
+            break;
+            case "Comment not added":
+                return $this->sendError($request->all(), $response["response"], 418);
+            break;
+            case "Comment added":
+                return $this->sendResponse($request->all(), $response["response"]);
+            break;
+        }
+    }
+
     //удаление комменатия
     public function deleteComment(Request $request){
         $authUser = App\User::selectAuthUser();
@@ -75,10 +104,10 @@ class CommentController extends Controller
         $response = $this->deleteComment($request);
         switch ($response) {
             case "Comment not found":
-                return back()->with("error", "Сообщения не существует");
+                return back()->with("error", "Комментария не существует");
             break;
             case "Comment deleted":
-                return back()->with("error", "Сообщение удалено");
+                return back()->with("error", "Комментарий удалён");
             break;
             case "LevelRights fail":
                 return back()->with("error", "Недостаточно прав для удаления");

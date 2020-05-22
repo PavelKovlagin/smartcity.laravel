@@ -88,7 +88,7 @@ class RegisterController extends Controller
          if(User::where('email', '=', $request->email)->exists())
          {
              $error = ["error" => "error exist"];
-             return $this->sendError('Email exist', $error, 200);
+             return $this->sendError($error, 'Email exist', 418);
          }
 
          $input = $request->all();

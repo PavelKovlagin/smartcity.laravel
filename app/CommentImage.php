@@ -7,50 +7,49 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use DB;
 
-class EventImage extends Model
+class CommentImage extends Model
 {
-    //запрос всех изображений для событий
-    public static function selectEventsImages() {
-        $eventsImages = DB::table('event_images')
+    //запрос всех изображений для комментариев
+    public static function selectCommentsImages() {
+        $commentsImages = DB::table('comment_images')
         ->join('images', 'images.id', '=', 'image_id')
         ->join('users', 'users.id', '=', 'user_id')
         ->join('roles', "roles.id", "=", "users.role_id")
         ->select(
-            'event_images.id',
             'images.id as image_id', 
-            'event_id', 
+            'comment_id', 
             'images.name as image_name',
             'users.id as user_id',
             'roles.levelRights as user_levelRights'
         );
-        return $eventsImages;
+        return $commentsImages;
     }
-    //запрос изображений для определенного по идентификатору события 
-    public static function selectEventImages($event_id) {
-        $eventImages = EventImage::selectEventsImages()
-        ->where("event_id", "=", $event_id);
-        return $eventImages;
+    //запрос изображений для определенного по идентификатору комментария 
+    public static function selectCommentImages($comment_id) {
+        $commentImages = CommentImage::selectCommentsImages()
+        ->where("comment_id", "=", $comment_id);
+        return $commentImages;
     }
     //запрос определенного по идентификатору изображения
-    public static function selectEventImage($eventImage_id) {
-        $eventImage = EventImage::selectEventsImages()
-        ->where("event_images.id", "=", $eventImage_id)
+    public static function selectCommentImage($commentImage_id) {
+        $commentImage = CommentImage::selectCommentsImages()
+        ->where("image_id", "=", $commentImage_id)
         ->first();
-        return $eventImage;
+        return $commentImage;
     }
     //запрос изображения по названию
-    public static function selectEventImage_name($image_name) {
-        $eventImage = DB::table('event_images')
+    public static function selectCommentImage_name($image_name) {
+        $commentImage = DB::table('comment_images')
         ->join('images', 'images.id', '=', 'image_id')
         ->where("images.name", "=", $image_name)
         ->select(
             'images.id as image_id', 
             'images.name as image_name',
         );
-        return $eventImage;
+        return $commentImage;
     }
     //добавление изображений
-    public static function insertEventImages($images, $event_id, $user_id){
+    public static function insertCommentImages($images, $comment_id, $user_id){
         if ($images <> null) {
             $currentDate = Carbon::now()->year
                         .'.'.Carbon::now()->month  
@@ -59,7 +58,6 @@ class EventImage extends Model
                         .'-'.Carbon::now()->minute
                         .'-'.Carbon::now()->second;
             $i = 0;
-            $string = "";
             foreach ($images as $image){
                 if (filesize($image) < 10000000){
                     $i++;
@@ -67,18 +65,17 @@ class EventImage extends Model
                         'public', $image, $currentDate.$i.'.jpg'
                     );
                     $image_id = Image::insertImage($currentDate.$i.'.jpg', $user_id);
-                    EventImage::insertEventImage($image_id, $event_id);
-                    $string = $string . ' ' . $file_name;
+                    CommentImage::insertCommentImage($image_id, $comment_id);
                 }
             }
         }
     }
     //добавление изображения
-    public static function insertEventImage($image_id, $event_id){
-        $eventImage = new EventImage;
-        $eventImage->image_id = $image_id;
-        $eventImage->event_id = $event_id;  
-        $eventImage->save();
-        return $eventImage->id;
+    public static function insertCommentImage($image_id, $comment_id){
+        $commentImage = new CommentImage;
+        $commentImage->image_id = $image_id;
+        $commentImage->comment_id = $comment_id;  
+        $commentImage->save();
+        return $commentImage->id;
     }
 }

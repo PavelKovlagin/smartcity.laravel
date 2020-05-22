@@ -26,7 +26,7 @@ class EventController extends Controller
             }
             return $this->sendResponse($events, count($events));
         } else {
-            return $this->sendError('Error load', 'Error load', 200);;  
+            return $this->sendError('Error load', 'Error load', 418);;  
         }
     }
     //возвращает информацию о событии, комментарии и изображения для этого события в формате json
@@ -35,8 +35,8 @@ class EventController extends Controller
         $event = App\Event::selectEvent(request('event_id'));
         if ($event == null) return $this->sendError([], "Not found event", 418);
         $images = App\EventImage::selectEventImages($event->id)->get();
-        $comments = \App\Comment::selectCommentsFromEvent($event->id)->get();
-        return $this->sendResponse(['event' => $event, 'images' => $images, 'comments' => $comments], $event->eventName);
+        $comments = \App\Comment::selectCommentsFromEvent($event->id);
+        return $this->sendResponse(['event' => $event, 'comments' => $comments], $event->eventName);
     }
     //api добавления события
     public function apiAddEvent(Request $request) {
@@ -163,10 +163,9 @@ class EventController extends Controller
         $authUser = App\User::selectAuthUser();
         $event = App\Event::selectEvent($id);
         $user = App\User::selectUser($event->user_id);
-        $comments = App\Comment::selectCommentsFromEvent($id)->get();
+        $comments = App\Comment::selectCommentsFromEvent($id);
         $statuses = App\Status::selectStatuses();
         $categories = App\Category::selectCategories();
-        $eventImages = $this::checkExistsImages(App\EventImage::selectEventImages($event->id)->get());
         //return dd($eventImages->get());
         return view('events.event', [
             'user' => $user,
@@ -174,7 +173,6 @@ class EventController extends Controller
             'event' => $event,
             'comments' => $comments,
             'statuses' => $statuses->get(),
-            'eventImages' => $eventImages,
             'categories' => $categories->get()]);
     }
     //обновление статуса события

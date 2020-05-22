@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Storage; 
-
 use Illuminate\Http\Request;
 use App;
 
@@ -20,7 +19,7 @@ class EventImageController extends Controller
                 AND (($authUser->levelRights > $user->levelRights)
                     OR ($authUser->user_id == $user->user_id)))
             App\EventImage::destroy($request->image_id);
-            return back();
+            return back()->with(["error" => "Изображение удалено"]);
         }        
     }
     //api удаления изображения
