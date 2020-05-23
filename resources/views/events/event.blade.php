@@ -11,19 +11,21 @@
 @if ($authUser <> false 
     AND (($event->user_id == $authUser -> user_id) AND ($event->status_id == 1)
     OR ($authUser->levelRights > 1) AND (($authUser->levelRights > $user->levelRights) OR ($authUser->user_id == $user->user_id))))
-    @foreach($event->eventImages as $image)
-        @if ($authUser->levelRights >= $image->user_levelRights)
-            <form action="/deleteEventImage" method="POST">
-            @csrf
+        
+        @if (count($event->eventImages) > 0)
+            <form action="/deleteEventImages" method="POST">
+            @csrf                 
             <input type="hidden" name="event_id" value="{{$event->id}}">
-            <input type="hidden" name="image_id" value="{{$image->id}}">    
-            <p><img src="{{asset('storage')}}/{{$image->image_name}}" height=150px></p> 
-            <input type="submit" value="Удалить">
+            @foreach($event->eventImages as $eventImage)
+                <img src="{{asset('storage')}}/{{$eventImage->image_name}}" height=150px> 
+                @if ($authUser->levelRights >= $eventImage->user_levelRights)
+                    <input type="checkbox" name="event_images_id[]" value="{{$eventImage->event_image_id}}">
+                @endif
+            @endforeach
+            <input type="submit" value="Удалить  изображения">
             </form>
-        @else
-            <p><img src="{{asset('storage')}}/{{$image->image_name}}" height=150px></p>
-        @endif
-    @endforeach     
+        @endif                
+
     <form enctype="multipart/form-data" action="/updateEvent" method="POST">
     @csrf
     <input  type="hidden" name="event_id" value="{{$event->id}}">    
@@ -62,7 +64,7 @@
     <p> Название события: {{$event->eventName}} </p>
     <p> Статус события: {{$event->statusName}} </p>
     <p> Описание события: {{$event->eventDescription}} </p>
-        @foreach($eventImages as $image)   
+        @foreach($event->eventImages as $image)   
             <img src="{{asset('storage')}}/{{$image->image_name}}" height=150px>
         @endforeach  
     <p> Долгота: {{$event->longitude}} </p>
@@ -116,11 +118,17 @@ var myPositionLongitude;
         @if (($authUser<>false) 
             AND (($authUser->levelRights > $comment->user_levelRights)
             OR ($authUser->user_id == $comment->user_id)))
-            @foreach ($comment->commentImages as $commentImage)
-                <form>
-                <img src="{{asset('storage')}}/{{$commentImage->image_name}}" height=60px>   
-                </form>     
-            @endforeach
+            @if (count($comment->commentImages) > 0)
+                <form action="/deleteCommentImages" method="POST">
+                @csrf
+                @foreach ($comment->commentImages as $commentImage)             
+                    <input type="hidden" name="comment_id" value="{{$comment->id}}">
+                    <img src="{{asset('storage')}}/{{$commentImage->image_name}}" height=60px> 
+                    <input type="checkbox" name="comment_images_id[]" value="{{$commentImage->comment_image_id}}">                                     
+                @endforeach
+                <input type="submit" value="Удалить  изображения">
+                </form> 
+            @endif 
             <form action="/deleteComment" method="POST">
             @csrf
             <input type='hidden' name='comment_id' value={{$comment->id}}>

@@ -7,7 +7,7 @@
                 <a href=/users>Пользователи </a> 
                 <a href=/statuses> Статусы </a>
                 <a href=/categories>Категории </a>
-                <a href=/deleteImagesWithoutLink> Удалить события без ссылки </a>
+                <a href=/deleteImagesWithoutLink> Удалить неиспользуемые изображения </a>
             @endif
         @endif 
         @guest <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>

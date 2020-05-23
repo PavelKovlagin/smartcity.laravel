@@ -4,25 +4,29 @@ namespace App\Http\Controllers;
 
 use App\CommentImages;
 use Illuminate\Http\Request;
+use App;
 
-class CommentImagesController extends Controller
+class CommentImageController extends Controller
 {
     //удаление изображения
-    public function deleteCommentImage(Request $request){
-        $eventImage = App\CommentImage::selectCommentImage($request->image_id);
-        if ($commentImage == null) return "Comment image not found";
+    public function deleteCommentImages(Request $request){
+        $comment = App\Comment::selectComment($request->comment_id);
+        if ($comment == null) return "Comment not found";
         $authUser = App\User::selectAuthUser();
-        $user = App\User::selectUser($commentImage->user_id);
+        $user = App\User::selectUser($comment->user_id);
+        //return dd($authUser->levelRights . " " . $user->levelRights);
         if ($authUser == false) return "User not authorized";
-        if (($authUser->levelRights < $user->levelRights) OR ($authUser->user_id <> $user->user_id)) return 'User level rights is low';
-        App\CommentImage::destroy($request->image_id);
-        return "Image deleted";
+        if (($authUser->levelRights < $user->levelRights) AND ($authUser->user_id <> $user->user_id)) return 'User level rights is low';        
+        foreach ($request->comment_images_id as $comment_image_id) {
+            App\CommentImage::destroy($comment_image_id);
+        }       
+        return "Images deleted";
     }        
 
-    public function webDeleteCommentImage(Request $request){
-        $response = $this->deleteCommentImage($request);
+    public function webDeleteCommentImages(Request $request){
+        $response = $this->deleteCommentImages($request);
         switch ($response) {
-            case "Comment image not found":
+            case "Comment not found":
                 return back()->with(["error" => "Изображение не найдено"]);
             break;
             case "User not authorized":
@@ -31,17 +35,17 @@ class CommentImagesController extends Controller
             case "User level rights is low":
                 return back()->with(["error" => "Недостаточный уровень прав пользователя"]);
             break;
-            case "Image deleted":
+            case "Images deleted":
                 return back()->with(["error" => " Изображение удалено"]);
             break;
         }
     } 
 
     //api удаления изображения
-    public function apiDeleteCommentImage(Request $request){
-        $response = $this->deleteCommentImage($request);
+    public function apiDeleteCommentImagesZz(Request $request){
+        $response = $this->deleteCommentImages($request);
         switch ($response) {
-            case "Comment image not found":
+            case "Comment not found":
                 return $this->sendError([], $response, 418);
             break;
             case "User not authorized":
@@ -50,7 +54,7 @@ class CommentImagesController extends Controller
             case "User level rights is low":
                 return $this->sendError([], $response, 418);
             break;
-            case "Image deleted":
+            case "Images deleted":
                 return $this->sendResponse($request, $response);
             break;
         }      

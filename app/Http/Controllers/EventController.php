@@ -34,7 +34,6 @@ class EventController extends Controller
         if (!request()->has('event_id')) return $this->sendError([], "No event_id", 418);
         $event = App\Event::selectEvent(request('event_id'));
         if ($event == null) return $this->sendError([], "Not found event", 418);
-        $images = App\EventImage::selectEventImages($event->id)->get();
         $comments = \App\Comment::selectCommentsFromEvent($event->id);
         return $this->sendResponse(['event' => $event, 'comments' => $comments], $event->eventName);
     }
@@ -166,7 +165,6 @@ class EventController extends Controller
         $comments = App\Comment::selectCommentsFromEvent($id);
         $statuses = App\Status::selectStatuses();
         $categories = App\Category::selectCategories();
-        //return dd($eventImages->get());
         return view('events.event', [
             'user' => $user,
             'authUser' => $authUser,

@@ -16,6 +16,7 @@ class CommentImage extends Model
         ->join('users', 'users.id', '=', 'user_id')
         ->join('roles', "roles.id", "=", "users.role_id")
         ->select(
+            'comment_images.id as comment_image_id',
             'images.id as image_id', 
             'comment_id', 
             'images.name as image_name',

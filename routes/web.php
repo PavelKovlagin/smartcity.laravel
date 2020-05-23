@@ -95,9 +95,11 @@ Route::get('/deleteEvent/{event_id}', 'EventController@deleteEvent');
 
 Route::get('/events/considersEvents', 'EventController@showConsidersEvents');
 
-Route::post("/deleteEventImage", "EventImageController@deleteEventImage");
+Route::post("/deleteEventImages", "EventImageController@webDeleteEventImages");
 
 //работа с комментариями
+
+Route::post('/deleteCommentImages', 'CommentImageController@webDeleteCommentImages');
 
 Route::post('/addComment', 'CommentController@webAddComment');
 
