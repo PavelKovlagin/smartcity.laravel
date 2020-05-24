@@ -9,7 +9,11 @@
 .pagination li a {
     color: #000;
     text-decoration: none;
-}   
+}  
+
+textarea {
+    resize: both;
+}  
 
 P.error{
     color: RGB(255,0,0);

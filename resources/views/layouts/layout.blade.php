@@ -8,12 +8,28 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
     <link href="{{ asset('css/default.css') }}" rel="stylesheet">
 
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" >
+
+
 </head>
 
 <body>
     @include('layouts/header')
-    @yield('content')
-    @include('layouts/footer')
+    
+         
+    <div class="jumbotron">
+      <div class="container">
+        @yield('content')
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+            @include('layouts/footer')
+        </div>
+      </div>
 </body>
 
 </html>

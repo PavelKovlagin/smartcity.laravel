@@ -15,7 +15,9 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 Route::get('/', function(){
-        return view('welcome');
+        $events = App\Event::selectVisibilityEvents()->get();
+        return view('welcome',
+                ["events" => $events]);
 });
 
 Route::get('/deleteImagesWithoutLink', 'ImageController@deleteImagesWithoutLink');

@@ -1,29 +1,56 @@
-<div class="links">
-    <a href=/events?status_id=0>События </a> 
-    @if(Auth::check())
-        <a href=/events?user_id={{Auth::user() -> id }}>Мои события</a> 
-        <a href=/users/user/{{Auth::user()->id}}>Мой профиль</a>
-            @if(App\User::selectAuthUser()->levelRights > 1)                
-                <a href=/users>Пользователи </a> 
-                <a href=/statuses> Статусы </a>
-                <a href=/categories>Категории </a>
-                <a href=/deleteImagesWithoutLink> Удалить неиспользуемые изображения </a>
-            @endif
-        @endif 
-        @guest <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-        @if (Route::has('register'))
-        <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-        @endif
-        @else
+<nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>   
 
-        <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-            {{ __('Logout') }}
-        </a>
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/events?status_id=0">События </a>
+            </li>
+            @if(Auth::check())
+            <li class="nav-item">
+                <a class="nav-link" href="/events?user_id={{Auth::user() -> id }}">Мои события</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/users/user/{{Auth::user()->id}}">Мои профиль</a>
+            </li>
+                @if(App\User::selectAuthUser()->levelRights > 1) 
+                    <li class="nav-item">
+                        <a class="nav-link" href="/users">Пользователи</a>
+                    </li>    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/statuses">Статусы</a>
+                    </li>    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/categories">Категории</a>
+                    </li> 
+                    <li class="nav-item">
+                        <a class="nav-link" href="/deleteImagesWithoutLink">Удалить неиспользуемые изображения</a>
+                    </li>         
+                @endif
+            @endif
+
+            @guest 
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                </li> 
+                @if (Route::has('register'))
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                </li> 
+                @endif
+            @else
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">{{ __('Logout') }}</a>
+            </li> 
 
         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
             @csrf
         </form>
-        <a> {{ Auth::user()->name }} </a>
-        @endguest
-</div>
+        <a class="navbar-brand" href="/users/user/{{Auth::user()->id}}">{{ Auth::user()->name }}</a>
+        @endguest          
+        </ul>
+    </div>
+</nav>

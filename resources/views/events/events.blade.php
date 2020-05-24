@@ -26,6 +26,7 @@
     <button type="submit">Применить фильтр</button>
     </p>     
 </form>
+
 @if(count($events)>0)    
     <table border="1">
         <tr>

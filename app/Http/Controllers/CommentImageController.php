@@ -16,7 +16,8 @@ class CommentImageController extends Controller
         $user = App\User::selectUser($comment->user_id);
         //return dd($authUser->levelRights . " " . $user->levelRights);
         if ($authUser == false) return "User not authorized";
-        if (($authUser->levelRights < $user->levelRights) AND ($authUser->user_id <> $user->user_id)) return 'User level rights is low';        
+        if (($authUser->levelRights < $user->levelRights) AND ($authUser->user_id <> $user->user_id)) return 'User level rights is low';
+        if ($request->comment_images_id == null) return "Images not selected";
         foreach ($request->comment_images_id as $comment_image_id) {
             App\CommentImage::destroy($comment_image_id);
         }       
@@ -35,6 +36,9 @@ class CommentImageController extends Controller
             case "User level rights is low":
                 return back()->with(["error" => "Недостаточный уровень прав пользователя"]);
             break;
+            case "Images not selected":
+                return back()->with(["error" => "Изображения не выбраны"]);
+            break;
             case "Images deleted":
                 return back()->with(["error" => " Изображение удалено"]);
             break;
@@ -52,6 +56,9 @@ class CommentImageController extends Controller
                 return $this->sendError([], $response, 418);
             break;
             case "User level rights is low":
+                return $this->sendError([], $response, 418);
+            break;
+            case "Images not selected":
                 return $this->sendError([], $response, 418);
             break;
             case "Images deleted":
