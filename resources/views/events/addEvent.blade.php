@@ -3,6 +3,16 @@
 Добавить событие
 @endsection
 @section('content')
+<script>
+    function MyPosition(){
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                document.getElementById('longitude').value = position.coords.longitude;
+                document.getElementById('latitude').value = position.coords.latitude;
+            }
+        );
+    }
+</script>
 @include('errors')
 @if($authUser<>false)
     @if($authUser->blocked == false)    
@@ -26,9 +36,11 @@
                             @endforeach
                             </select></p>
                             <p> Долгота: </p>
-                            <input class="form-control" required type="number" step="any" name="longitude">
+                            <input class="form-control" required type="number" step="any" id="longitude" name="longitude">
                             <p> Широта:</p>
-                            <input class="form-control" required type="number" step="any" name="latitude">
+                            <input class="form-control" required type="number" step="any" id="latitude" name="latitude">
+                            <br>
+                            <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Мое местоположение" onClick="MyPosition()">
                             <p>Изображения</p>
                             <input class="form-control" multiple type="file" name="images[]" accept="image/*">
                             <br><br><br>

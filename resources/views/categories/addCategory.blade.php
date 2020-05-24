@@ -16,7 +16,7 @@
                                 <p> Название категории: <input class="form-control" type="text" name="categoryName" required></p>
                                 <p> Описание события:</p>
                                 <textarea class="form-control" type="text" name="categoryDescription" required></textarea>
-                                <br>
+                                <br>                                
                                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit"> Добавить </button>
                             </form>
                         </div>

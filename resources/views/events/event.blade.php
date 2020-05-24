@@ -30,6 +30,7 @@
                                                 <input type="checkbox" name="event_images_id[]" value="{{$eventImage->event_image_id}}">
                                             @endif
                                         @endforeach
+                                        <br>
                                         <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Удалить  изображения">
                                         </form>
                                     @endif                
@@ -77,36 +78,28 @@
                                 <p> Долгота: {{$event->longitude}} </p>
                                 <p> Широта: {{$event->latitude}} </p>    
                             @endif
-                            <script src="http://api-maps.yandex.ru/2.0/?load=package.full&lang=ru-RU" type="text/javascript"></script>
+
+                            <script src="//api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
                             <script type="text/javascript">
-                            var longitude = {{$event->longitude}};
-                            var latitude = {{$event->latitude}};
-                            var myPositionLatitude;
-                            var myPositionLongitude;
-                                    // Как только будет загружен API и готов DOM, выполняем инициализацию
-                                    ymaps.ready(init);
-                                    function init () {
-                                        // Создание экземпляра карты и его привязка к контейнеру с
-                                        // заданным id ("map")
-                                        var myMap = new ymaps.Map('map', {
-                                                // При инициализации карты, обязательно нужно указать
-                                                // ее центр и коэффициент масштабирования
-                                                center: [latitude, longitude], // Событие
-                                                zoom: 13
-                                            }); 
-                                        // Создание метки 
-                                        var myPlacemark = new ymaps.Placemark(
-                                        // Координаты метки
-                                        [latitude, longitude]        
-                                        );
-                                        var myPosition = new ymaps.Placemark(
-                                            [myPositionLatitude, myPositionLongitude]
-                                        ); 
-                                        // Добавление метки на карту
-                                        myMap.geoObjects.add(myPlacemark);  
-                                    }
+                            ymaps.ready(init);
+
+                            function init() {
+                            var myMap = new ymaps.Map('map_pl', {
+                                        center: [{{$event->latitude}}, {{$event->longitude}}],
+                                        zoom: 11,
+                                        controls: ['zoomControl', 'typeSelector', 'trafficControl']
+                                    }, {
+                                        searchControlProvider: 'yandex#search'
+                                    })  
+
+                                    myMap.geoObjects.add(new ymaps.Placemark([{{$event->latitude}}, {{$event->longitude}}], {
+                                        balloonContent: '<strong>{{$event->eventName}}</strong><br/>{{$event->eventDescription}}',
+                                    }, {
+                                    preset: 'islands#redDotIconWithCaption'
+                                    }));
+                            }
                             </script>
-                            <div id="map" style="width:600px; height:400px"></div>
+                            <div id="map_pl" style="width:600px; height:400px"></div>
                             <br>
 
                                 @if($authUser <> false)
