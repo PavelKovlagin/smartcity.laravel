@@ -3,10 +3,12 @@
 Smart City
 @endsection
 @section('content')
-<div class="container">
-<h1>Добро пожаловать в Умный Город, приложение для мониторинга городских проблем</h1>
+<div class="row justify-content-center" style="text-align: center">
+    <h1>Добро пожаловать в Умный Город, приложение для мониторинга городских проблем</h1>
+    <div id="map_pl" style="width:1920px; height:1080px">
 </div>
-<div id="map_pl" style="width:640px; height:400px">
+
+
 <script src="//api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 <script type="text/javascript">
 ymaps.ready(init);

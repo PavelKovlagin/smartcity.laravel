@@ -6,6 +6,9 @@
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
+                <a class="nav-link" href="/">На главную </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="/events?status_id=0">События </a>
             </li>
             @if(Auth::check())
