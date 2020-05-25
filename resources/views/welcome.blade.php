@@ -5,7 +5,7 @@ Smart City
 @section('content')
 <div class="row justify-content-center" style="text-align: center">
     <h1>Добро пожаловать в Умный Город, приложение для мониторинга городских проблем</h1>
-    <div id="map_pl" style="width:1920px; height:1080px">
+    <div id="map_pl" style="width:1920px; height:1080px"></div>
 </div>
 
 

@@ -15,9 +15,7 @@
 </script>
 @include('errors')
 @if($authUser<>false)
-    @if($authUser->blocked == false)    
-    <form enctype="multipart/form-data" action="{{ url('/addEvent') }}" method="POST">
-        {{ csrf_field() }}    
+    @if($authUser->blocked == false)     
         <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -26,6 +24,8 @@
 
                     <div class="card-body">
                         <div class="col-md-12">
+                            <form enctype="multipart/form-data" action="{{ url('/addEvent') }}" method="POST">
+                            {{ csrf_field() }} 
                             <p> Название события:</p>
                             <input required class="form-control" type="text" name="eventName">
                             <p> Описание события:</p>
@@ -42,20 +42,20 @@
                             <br>
                             <input class="btn btn-outline-success my-2 my-sm-0" type="button" value="Мое местоположение" onClick="MyPosition()">
                             <p>Изображения</p>
-                            <input class="form-control" multiple type="file" name="images[]" accept="image/*">
+                            <input class="btn btn-outline-success my-2 my-sm-0" multiple type="file" name="images[]" accept="image/*">
                             <br><br><br>
                             <button class="btn btn-outline-success my-2 my-sm-0" type="submit"> Добавить </button>  
                             </form>    
-                            @else
-                            <p class='error'>Вы не можете добавлять события, Ваш профиль заблокирован до {{$authUser->blockDate}} </p>
-                            @endif
-                        @else
-                        <p>Вы не авторизованы</p>
-                        @endif
+    @else
+    <p class='error'>Вы не можете добавлять события, Ваш профиль заблокирован до {{$authUser->blockDate}} </p>
+    @endif
+@else
+<p>Вы не авторизованы</p>
+@endif
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
+        </div>
 @endsection

@@ -3,7 +3,6 @@
 {{$event->eventName}}
 @endsection
 @section('content')
-{{session('hey')}}
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -99,9 +98,11 @@
                                     }));
                             }
                             </script>
-                            <div id="map_pl" style="width:600px; height:400px"></div>
-                            <br>
 
+                            <div class="row justify-content-center" style="text-align: center">
+                                <div id="map_pl" style="width:640px; height:400px"></div>
+                            </div>
+                            <br>
                                 @if($authUser <> false)
                                     <form enctype="multipart/form-data" action="{{ url('/addComment') }}" method="POST">
                                     @csrf

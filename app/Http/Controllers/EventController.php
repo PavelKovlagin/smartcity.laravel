@@ -161,6 +161,7 @@ class EventController extends Controller
     public function showEvent($id){
         $authUser = App\User::selectAuthUser();
         $event = App\Event::selectEvent($id);
+        if($event == null) return redirect("/events")->with(["message" => "Событие не найдено"]);
         $user = App\User::selectUser($event->user_id);
         $comments = App\Comment::selectCommentsFromEvent($id);
         $statuses = App\Status::selectStatuses();

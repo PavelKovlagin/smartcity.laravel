@@ -62,6 +62,7 @@ class Event extends Model
         $event = Event::selectEvents()
         ->where('events.id', '=', $event_id)
         ->first();
+        if ($event == null) return null;
         $event->eventImages = Image::checkExistsImages(EventImage::selectEventImages($event_id)->get());
         return $event;
     }  

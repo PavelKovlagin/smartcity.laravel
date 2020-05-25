@@ -41,7 +41,7 @@
                                                 <option @if($user->role_id == $role->role_id) selected @endif value="{{$role->role_id}}">{{$role->role_name}}</option>
                                                 @endforeach
                                             </select>
-                                            <button type="submit"> Обновить </button>
+                                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit"> Обновить </button>
                                             </form>
                                         @endif
                                 @if ($authUser->levelRights > $user->levelRights)             
