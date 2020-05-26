@@ -15,8 +15,7 @@
 
 <body>
     @include('layouts/header')
-    
-         
+    <br>         
     <div class="jumbotron">
       <div class="container">
         @yield('content')

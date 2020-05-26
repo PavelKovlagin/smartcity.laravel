@@ -4,14 +4,20 @@
 @endsection
 @section('content')
 <script>
-    function MyPosition(){
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                document.getElementById('longitude').value = position.coords.longitude;
-                document.getElementById('latitude').value = position.coords.latitude;
-            }
-        );
-    }
+function MyPosition(){
+
+    function success(pos) {
+    var crd = pos.coords;
+    document.getElementById('longitude').value = crd.longitude ;
+    document.getElementById('latitude').value = crd.latitude;
+    };
+
+    function error(err) {
+    alert("Ошибка геолокации. Код ошибки: " + err.code + ". Сообщение: " + err.message);
+    };
+
+    navigator.geolocation.getCurrentPosition(success, error, {enableHighAccuracy: true, timeout: 5000, maximumAge: 0});
+}
 </script>
 @include('errors')
 @if($authUser<>false)
