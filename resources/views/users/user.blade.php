@@ -8,7 +8,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{$user->surname}} {{$user->user_name}} {{$user->surname}}</div>
+                <div class="card-header">{{$user->surname}} {{$user->user_name}} {{$user->subname}}</div>
                         
                     <div class="card-body">
                         <div class="col-md-12">
