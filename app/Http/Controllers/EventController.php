@@ -37,8 +37,8 @@ class EventController extends Controller
         $comments = \App\Comment::selectCommentsFromEvent($event->id);
         return $this->sendResponse(['event' => $event, 'comments' => $comments], $event->eventName);
     }
-    //api добавления события
-    public function apiAddEvent(Request $request) {
+
+    public function addEvent(Request $request) {
         $validator = Validator::make($request->all(), [
             "eventName" => "required",
             "eventDescription" => "required",
@@ -46,23 +46,66 @@ class EventController extends Controller
             "latitude" => "required|numeric",
             "category_id" => "required"
         ]);
-        if ($validator->fails()) {
-            return $this->sendError('Error update event. Validation failed', $validator->errors(), 418);
-        }
+        if ($validator->fails()) return array("response" => "Validation failed", "validator" => $validator->errors());
         $authUser = App\User::selectAuthUser();
-        if ($authUser<>false AND $authUser->blocked == false) {
-            if ($event_id = App\Event::insertEvent(Auth::id(), $request) <> false) {
-                App\EventImage::insertEventImages($request->images, $event_id, Auth::id()); 
-                return $this->sendResponse($request->all(), 'Event added.');
-            } else {
-                return $this->sendError($request->all(), 'Event not added.', 418);
-            }            
+        if ($authUser == false) return array("response" => "User not authorized");
+        if ($authUser->blocked <> false) return array("response" => "User blocked", "dateBlock" => $authUser->blockDate);
+        $event_id = App\Event::insertEvent($authUser->user_id, $request);
+        if ($event_id > 0) 
+        {
+            App\EventImage::insertEventImages($request->images, $event_id, $authUser->user_id);
+            return array("response" => "Event added");  
         } else {
-            return $this->sendError($request->all(), 'User blocked.', 418);
+            return array("response" => "Event not added");
         }
     }
+
+    public function webAddEvent(Request $request){        
+        $response = $this->addEvent($request);
+        switch ($response["response"]) {
+            case "Validation failed":
+                return back()->with(["message" => "Валидация не пройдена: " . $response["validator"]]);
+            break;
+            case "User not authorized":
+                return back()->with(["message" => "Пользователь не авторизован"]);
+            break;
+            case "User blocked":
+                return back()->with(["message" => "Пользователь заблокирован до " . $response["dateBlock"]]);
+            break;
+            case "Event not added":
+                return back()->with(["message" => "Событие не добавлено"]);
+            break;
+            case "Event added":
+                return redirect("/events")->with(["message" => "Событе добавлено"]);
+            break;            
+        }
+    }
+
+    //api добавления события
+    public function apiAddEvent(Request $request) {
+
+        $response = $this->addEvent($request);
+        switch ($response["response"]) {
+            case "Validation failed":
+                return $this->sendError($response["validator"], "Validation failed", 418);
+            break;
+            case "User not authorized":
+                return $this->sendError([], "User not authorized", 418);
+            break;
+            case "User blocked":
+                return $this->sendError([], "User blocked " . $response["dateBlock"], 418);
+            break;
+            case "Event not added":
+                return $this->sendError([], "Event not added", 418);
+            break;
+            case "Event added":
+                return $this->sendResponse($request->all(), "Event added");
+            break;            
+        }
+    }
+
     //api обновления события
-    public function apiUpdateEvent(Request $request) {
+    public function updateEvent(Request $request) {
         $validator = Validator::make($request->all(), [
             'event_id' => "required",
             "eventName" => "required",
@@ -72,48 +115,82 @@ class EventController extends Controller
             "category_id" => "required"
         ]);
         if ($validator->fails()) {
-            return $this->sendError('Error adding event.', $validator->errors(), 418);
+            return array("response" => "Validation failed", "validator" => $validator->errors());
         }
         $authUser = App\User::selectAuthUser();
-        $event = App\Event::selectEvent($request->event_id);
+        $event = App\Event::selectEvent($request->event_id);        
+        if ($event == null) 
+            return array("response" => "Event not found");
+        $user = App\User::selectUser($event->user_id);
         if (!$authUser) {
-            return $this->sendError($request->all(), 'Authorization failed.', 418);
+            return array("response" => "User not authorized");
         }
-        if ($authUser->user_id <> $event->user_id) {
-            return $this->sendError($request->all(), "It's not your event. Go away", 418);
+        if (($authUser->user_id <> $event->user_id) AND ($authUser->levelRights < $user->levelRights)) {
+            return array("response" => "It's not your event. Go away");
         }
-        if($event->status_id <> 1) {
-            return $this->sendError($request->all(), 'Event have other status. Too late', 418);
+        if (($event->status_id <> 1) AND ($authUser->levelRights < 2)) {
+            return array("response" => "Event have other status. Too late");
         }
-        if (!App\Event::updateEvent($request)) {
-            return $this->sendError($request->all(), 'Event not update.', 418);
+        $event_id = App\Event::updateEvent($request);
+        if ($event_id = 0) {     
+            return array("response" => "Event not update");       
         }
-        return $this->sendResponse($request->all(), 'Event update.');
+        App\EventImage::insertEventImages($request->images, $request->event_id, $authUser->user_id);
+        return array("response" => "Event update");
     }
-    //добавление события и перенаправления на страницу со списком всех событий
-    public function addEvent(Request $request){
-        $authUser = App\User::selectAuthUser();
-        if ($authUser<>false AND $authUser->blocked == false){
-            $event_id = App\Event::insertEvent($authUser->user_id, $request);
-            App\EventImage::insertEventImages($request->images, $event_id, $authUser->user_id);            
-            return redirect("/events");
-        } else {
-            return redirect("/events");
+    
+    //обновление события и перенаправление на страницу события 
+    public function apiUpdateEvent(Request $request){
+        $response = $this->updateEvent($request);
+        switch ($response["response"]) {
+            case "Validation failed":
+                return $this->sendError($response["validator"], $response["response"], 418);
+            break;
+            case "Event not found":
+                return $this->sendError([], $response["response"], 418);
+            break;
+            case "User not authorized":
+                return $this->sendError([], $response["response"], 418);
+            break;
+            case "It's not your event. Go away":
+                return $this->sendError([], $response["response"], 418);
+            break;
+            case "Event have other status. Too late":
+                return $this->sendError($request->all(), $response["response"], 418);
+            break; 
+            case "Event not update":
+                return $this->sendError([], $response["response"], 418);
+            break;  
+            case "Event update":
+                return $this->sendResponse($request->all(), $response["response"]);
+            break;           
         }
     }
     //обновление события и перенаправление на страницу события 
-    public function updateEvent(Request $request){
-        $authUser = App\User::selectAuthUser();
-        $event = App\Event::selectEvent($request->event_id);
-        $user = App\User::selectUser($event->user_id);
-        if (($authUser<>false) 
-            AND (($authUser->levelRights > $user->levelRights)
-                OR (($authUser->user_id == $user->user_id) AND ($event->status_id == 1 OR $authUser->levelRights > 1)))) {
-            App\EventImage::insertEventImages($request->images, $request->event_id, $authUser->user_id);   
-            App\Event::updateEvent($request);
-            return redirect ("/events/$request->event_id");
-        } else {
-            return redirect ("/events/$request->event_id");;
+    public function webUpdateEvent(Request $request){
+        $response = $this->updateEvent($request);
+        switch ($response["response"]) {
+            case "Validation failed":
+                return back()->with(["message" => "Валидация не пройдена: " . $response["validator"]]);
+            break;
+            case "Event not found":
+                return redirect("/events")->with(["message" => "Событие не найдено"]);
+            break;
+            case "User not authorized":
+                return back()->with(["message" => "Пользователь не авторизован"]);
+            break;
+            case "It's not your event. Go away":
+                return back()->with(["message" => "Это не ваше событие"]);
+            break;
+            case "Event have other status. Too late":
+                return back()->with(["message" => "Вы не можете обновить событие, так как оно прошло модерацию"]);
+            break; 
+            case "Event not update":
+                return back()->with(["message" => "Событие не обновлено"]);
+            break;  
+            case "Event update":
+                return back()->with(["message" => "Событие обновлено"]);
+            break;           
         }
     }
     //передача данных и открытие страницы со списком событий
@@ -161,7 +238,7 @@ class EventController extends Controller
     public function showEvent($id){
         $authUser = App\User::selectAuthUser();
         $event = App\Event::selectEvent($id);
-        if($event == null) return redirect("/events")->with(["message" => "Событие не найдено"]);
+        if ($event == null) return redirect("/events")->with(["message" => "Событие не найдено"]);
         $user = App\User::selectUser($event->user_id);
         $comments = App\Comment::selectCommentsFromEvent($id);
         $statuses = App\Status::selectStatuses();

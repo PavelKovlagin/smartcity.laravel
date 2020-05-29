@@ -123,7 +123,7 @@ class UserController extends Controller
     public function apiSelectUser(Request $request){
         $authUser = App\User::selectAuthUser();
         if ($authUser == null) return $this->sendError([], "Failed user", 418);
-        return $this->sendResponse($authUser, "User");
+        return $this->sendResponse($authUser, $authUser->surname . " " . $authUser->user_name . " " . $authUser->subname);
     }
     //изменение пароля
     public function passwordChange(Request $request) {

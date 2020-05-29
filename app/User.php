@@ -58,7 +58,6 @@ class User extends Authenticatable
             'code_reset_password',
             'validity_password_reset_code',
             'levelRights',
-            'notRemove',
         );
         return $users;
     }

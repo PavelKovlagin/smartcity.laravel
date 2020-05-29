@@ -50,7 +50,7 @@ class Comment extends Model
     }
     //добавление комментария
     protected static function addComment($request, $user_id) {
-        if (Event::selectEvent($request->event_id) <> null) {
+        if (Event::selectevent($request->event_id) <> null) {
             $comment = new \App\Comment;
             $comment->user_id = $user_id;
             $comment->event_id = $request->event_id;

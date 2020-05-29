@@ -8,7 +8,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{$user->surname}} {{$user->user_name}} {{$user->surname}}</div>
+                <div class="card-header">{{$user->surname}} {{$user->user_name}} {{$user->subname}}</div>
                         
                     <div class="card-body">
                         <div class="col-md-12">
@@ -35,7 +35,7 @@
                                         @if($authUser->levelRights == 3)
                                         <form action="{{ url('/updateRole') }}" method="POST">
                                             @csrf
-                                            <input  type="hidden" name="user_id" value="{{$user->user_id}}">
+                                            <input type="hidden" name="user_id" value="{{$user->user_id}}">
                                             <select class="form-control" name="role_id">
                                                 @foreach($roles as $role)
                                                 <option @if($user->role_id == $role->role_id) selected @endif value="{{$role->role_id}}">{{$role->role_name}}</option>

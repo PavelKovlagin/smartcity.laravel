@@ -94,9 +94,9 @@ class Event extends Model
                             'latitude'=>$request->latitude,
                             'category_id' => $request->category_id,
                             'dateChange' => Carbon::now()));
-            return true;
+            return $request->event_id;
         } else {
-            return false;
+            return 0;
         }
     }
     //обновление статуса события

@@ -3,14 +3,15 @@
 {{$event->eventName}}
 @endsection
 @section('content')
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{$event->eventName}}</div>
-                        
+                <div class="card-header">{{$event->eventName}}</div>                      
                     <div class="card-body">
                         <div class="col-md-12">
+                        <p class="error">{{session("message")}}</p> 
                             <p class="error"> {{session('error')}} </p>
                             <p> Пользователь: {{$event->email}} </p>
                             <p> Дата создания: {{$event->event_date}} </p>
@@ -98,11 +99,10 @@
                                     }));
                             }
                             </script>
-
                             <div class="row justify-content-center" style="text-align: center">
                                 <div id="map_pl" style="width:640px; height:400px"></div>
                             </div>
-                            <br>
+
                                 @if($authUser <> false)
                                     <form enctype="multipart/form-data" action="{{ url('/addComment') }}" method="POST">
                                     @csrf

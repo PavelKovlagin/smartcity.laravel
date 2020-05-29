@@ -3,7 +3,7 @@
 {{$title}}
 @endsection
 @section('content')
-<p class="error"> {{session('message')}} </p>
+<p class="error">{{session("message")}}</p>
 <h1>{{$title}}</h1>
 @if (Auth::check())
     <button type="submit" onclick="location.href='/events/addEvent'">Добавить событие</button>

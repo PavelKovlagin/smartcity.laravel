@@ -16,7 +16,6 @@ ymaps.ready(function () {
     var myMap = new ymaps.Map('map_pl', {
             center: [55.751574, 37.573856],
             zoom: 9,
-            controls: ['zoomControl', 'typeSelector', 'trafficControl']
         }),
         clusterer = new ymaps.Clusterer({
             preset: 'islands#invertedVioletClusterIcons',
