@@ -9,7 +9,7 @@ use App;
 
 class CategoryController extends Controller
 {
-    //передача данных И открытие представления categories 
+    //передача данных и открытие представления categories 
     public function showCategories() {
         $authUser = App\User::selectAuthUser();
         $categories = App\Category::selectcategories()->paginate(10);

@@ -10,37 +10,36 @@ class CommentImageController extends Controller
 {
     //удаление изображения
     public function deleteCommentImages(Request $request){
+        if ($request->comment_images_id == null) return array("response" =>"Images null");
         $comment = App\Comment::selectComment($request->comment_id);
-        if ($comment == null) return "Comment not found";
+        if ($comment == null) return array("response" => "Comment not found");
         $authUser = App\User::selectAuthUser();
         $user = App\User::selectUser($comment->user_id);
-        //return dd($authUser->levelRights . " " . $user->levelRights);
-        if ($authUser == false) return "User not authorized";
-        if (($authUser->levelRights < $user->levelRights) AND ($authUser->user_id <> $user->user_id)) return 'User level rights is low';
-        if ($request->comment_images_id == null) return "Images not selected";
+        if ($authUser == false) return array("response" => "User not authorized");    
+        $deletedImages = 0;
         foreach ($request->comment_images_id as $comment_image_id) {
-            App\CommentImage::destroy($comment_image_id);
+            if (($authUser->levelRights > $user->levelRights)
+                OR ($authUser->user_id == $user->user_id)) {
+                App\CommentImage::destroy($comment_image_id);
+                $deletedImages++;
+            }
         }       
-        return "Images deleted";
+        return array("response" => "Images deleted", "Deleted images" => $deletedImages);
     }        
 
     public function webDeleteCommentImages(Request $request){
         $response = $this->deleteCommentImages($request);
-        switch ($response) {
+        switch ($response["response"]) {
             case "Comment not found":
-                return back()->with(["error" => "Изображение не найдено"]);
+                return back()->with(["message" => "Комментарий не найден"]);
             break;
             case "User not authorized":
-                return back()->with(["error" => "Пользователь не авторизован"]);
+                return back()->with(["message" => "Пользователь не авторизован"]);
             break;
-            case "User level rights is low":
-                return back()->with(["error" => "Недостаточный уровень прав пользователя"]);
-            break;
-            case "Images not selected":
-                return back()->with(["error" => "Изображения не выбраны"]);
-            break;
+            case "Images null":
+                return back()->with(["message" => "Изображения не выбраны"]);
             case "Images deleted":
-                return back()->with(["error" => " Изображение удалено"]);
+                return back()->with(["message" => " Изображений удалено: " . $response["Deleted images"]]);
             break;
         }
     } 

@@ -1,1 +1,1 @@
-<p>Здесь могла бы быть ваша реклама</p>
+<p>E-mail: smartcityvlsu@gmail.com</p>

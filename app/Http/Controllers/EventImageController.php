@@ -7,23 +7,8 @@ use App;
 
 class EventImageController extends Controller
 {
-    //удаление изображений события
-    public function deleteEventImages2(Request $request){
-        if ($request->event_images_id == null) return "Images null";
-        $images = App\EventImage::selectImages($request->event_images_id)->get();
-        $authUser = App\User::selectAuthUser();
-        if ($authUser == false) return "User not authorized";
-        foreach ($images as $image) {
-            if (($authUser->levelRights > $image->user_levelRights) OR ($authUser->user_id == $image->user_id)) {
-                App\EventImage::destroy($image->event_image_id);
-            }            
-        }
-        return "Images deleted";
-    }
-
-    //удаление изображений события
-    public function deleteEventImages(Request $request){
-        
+    //Удаление изображений событий. Параметры: $request – параметры POST запроса
+    public function deleteEventImages(Request $request){        
         if ($request->event_images_id == null) return array("response" => "Images null");
         $images = App\EventImage::selectImages($request->event_images_id)->get();
         $authUser = App\User::selectAuthUser();
