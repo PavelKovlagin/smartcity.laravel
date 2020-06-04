@@ -12,32 +12,29 @@ use App;
 class EventController extends Controller
 {
     //возвращение запроса, после определенной даты, в формате json
-    public function apiSelectEvents(){   
-        $dateChange = request('dateChange');     
-        if (preg_match("/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/", $dateChange)) {
-            $dateChange = request('dateChange');
-            $events = App\Event::selectEventsDateChange($dateChange)->get();
-            foreach ($events as $event) {
-                //if ($authUser->user_id <> $event->user_id)
-                if ($event->visibilityForUser == 0) {
-                    $event->eventName = "";
-                    $event->eventDescription = "";
-                }
+    public function apiSelectEvents(Request $request){  
+        $validator = Validator::make($request->all(), [
+            "dateChange" => "required|date",
+        ]);
+        if ($validator->fails()) return $this->sendError([], "Validation failed", 418);
+        $events = App\Event::selectEventsDateChange($request->dateChange)->get();
+        foreach ($events as $event) {
+
+            if ($event->visibilityForUser == 0) {
+                $event->eventName = "";
+                $event->eventDescription = "";
             }
-            return $this->sendResponse($events, count($events));
-        } else {
-            return $this->sendError('Error load', 'Error load', 418);;  
         }
+        return $this->sendResponse($events, count($events));
     }
     //возвращает информацию о событии, комментарии и изображения для этого события в формате json
     public function apiSelectEvent() {
         if (!request()->has('event_id')) return $this->sendError([], "No event_id", 418);
         $event = App\Event::selectEvent(request('event_id'));
         if ($event == null) return $this->sendError([], "Not found event", 418);
-        $comments = \App\Comment::selectCommentsFromEvent($event->id);
-        return $this->sendResponse(['event' => $event, 'comments' => $comments], $event->eventName);
+        return $this->sendResponse($event, $event->eventName);
     }
-
+    //Добавление события. Параметры: $request – параметры POST запроса
     public function addEvent(Request $request) {
         $validator = Validator::make($request->all(), [
             "eventName" => "required",
@@ -59,7 +56,7 @@ class EventController extends Controller
             return array("response" => "Event not added");
         }
     }
-
+    //добавление события в WEB
     public function webAddEvent(Request $request){        
         $response = $this->addEvent($request);
         switch ($response["response"]) {
@@ -80,8 +77,7 @@ class EventController extends Controller
             break;            
         }
     }
-
-    //api добавления события
+    //API добавления события
     public function apiAddEvent(Request $request) {
 
         $response = $this->addEvent($request);
@@ -104,7 +100,7 @@ class EventController extends Controller
         }
     }
 
-    //api обновления события
+    //Обновление события. Параметры: $request – параметры POST запроса
     public function updateEvent(Request $request) {
         $validator = Validator::make($request->all(), [
             'event_id' => "required",
@@ -139,7 +135,7 @@ class EventController extends Controller
         return array("response" => "Event update");
     }
     
-    //обновление события и перенаправление на страницу события 
+    //API обновления события
     public function apiUpdateEvent(Request $request){
         $response = $this->updateEvent($request);
         switch ($response["response"]) {
@@ -166,7 +162,7 @@ class EventController extends Controller
             break;           
         }
     }
-    //обновление события и перенаправление на страницу события 
+    //Обновления события в Web
     public function webUpdateEvent(Request $request){
         $response = $this->updateEvent($request);
         switch ($response["response"]) {
@@ -193,7 +189,7 @@ class EventController extends Controller
             break;           
         }
     }
-    //передача данных и открытие страницы со списком событий
+    //Открытие представления events с информацией о событиях
     public function showEvents(){
         $authUser = App\User::selectAuthUser();
         if (request()->has('user_id') 
@@ -234,7 +230,7 @@ class EventController extends Controller
             'events' => $events,       
         ]);
     }
-    //передача данных и открытие страницы определенного события
+    //Открытие представления event с информацией о событии. Параметры: $id – идентификатор события
     public function showEvent($id){
         $authUser = App\User::selectAuthUser();
         $event = App\Event::selectEvent($id);
@@ -251,7 +247,7 @@ class EventController extends Controller
             'statuses' => $statuses->get(),
             'categories' => $categories->get()]);
     }
-    //обновление статуса события
+    //Обновление статуса события. Параметры: $request – параметры POST запроса
     public function updateEventStatus(Request $request){
         $authUser = App\User::selectAuthUser();
         $user = App\User::selectUser($request->user_id);        

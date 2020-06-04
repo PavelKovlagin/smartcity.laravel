@@ -13,7 +13,9 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', "UserController@apiSelectUser");
+Route::middleware('auth:api')->get('/profile', "UserController@apiSelectMyProfile");
+
+Route::get("/user/{id}", 'UserController@apiSelectUser');
 
 Route::get('/getOauthClient', 'UserController@apiGetClientAuthentication');
 
@@ -26,6 +28,8 @@ Route::middleware("auth:api")->post('/addComment', 'CommentController@apiAddComm
 Route::middleware("auth:api")->post('/deleteComment', 'CommentController@apiDeleteComment');
 
 Route::middleware("auth:api")->post('/deleteEventImages', 'EventImageController@apiDeleteEventImages');
+
+Route::middleware("auth:api")->post('/deleteCommentImages', 'CommentImageController@apiDeleteCommentImages');
 
 Route::middleware('auth:api')->post('/addEvent', 'EventController@apiAddEvent');
 

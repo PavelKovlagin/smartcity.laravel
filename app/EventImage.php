@@ -16,21 +16,20 @@ class EventImage extends Model
         ->join('users', 'users.id', '=', 'user_id')
         ->join('roles', "roles.id", "=", "users.role_id")
         ->select(
-            'event_images.id as event_image_id',
-            'images.id as image_id', 
-            'event_id', 
+            'event_images.id as image_id',
             'images.name as image_name',
             'users.id as user_id',
             'roles.levelRights as user_levelRights'
         );
         return $eventsImages;
     }
-
+    //запрос списка изображений по списку id
     public static function selectImages($images_id){
         $images = EventImage::selectEventsImages()
         ->whereIn("event_images.id", $images_id);
         return $images;
     }
+
     //запрос изображений для определенного по идентификатору события 
     public static function selectEventImages($event_id) {
         $eventImages = EventImage::selectEventsImages()

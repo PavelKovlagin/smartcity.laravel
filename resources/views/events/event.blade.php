@@ -13,7 +13,7 @@
                         <div class="col-md-12">
                         <p class="error">{{session("message")}}</p> 
                             <p class="error"> {{session('error')}} </p>
-                            <p> Пользователь: {{$event->email}} </p>
+                            <p> Пользователь: <a href="/users/user/{{$user->user_id}}"> {{$event->email}}</a> </p>
                             <p> Дата создания: {{$event->event_date}} </p>
                             <p> Дата последнего обновления: {{$event->dateChange}} </p>
                             @if ($authUser <> false 
@@ -25,10 +25,13 @@
                                         @csrf                 
                                         <input type="hidden" name="event_id" value="{{$event->id}}">
                                         @foreach($event->eventImages as $eventImage)
-                                            <img src="{{asset('storage')}}/{{$eventImage->image_name}}" height=150px> 
+                                            <img onClick="document.location.href = '{{asset('storage')}}/{{$eventImage->image_name}}'" src="{{asset('storage')}}/{{$eventImage->image_name}}" height=130px>                                        
                                             @if ($authUser->levelRights >= $eventImage->user_levelRights)
-                                                <input type="checkbox" name="event_images_id[]" value="{{$eventImage->event_image_id}}">
+                                            <div style="display: inline; position: relative">                                                    
+                                                <input type="checkbox" name="event_images_id[]" value="{{$eventImage->image_id}}" style="position:absolute; top:-47px; right:13px">    
+                                            </div>
                                             @endif
+                                            
                                         @endforeach
                                         <br>
                                         <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Удалить  изображения">
@@ -71,9 +74,10 @@
                             @else    
                                 <p> Название события: {{$event->eventName}} </p>
                                 <p> Статус события: {{$event->statusName}} </p>
+                                <p> Категория события: {{$event->categoryName}} </p>
                                 <p> Описание события: {{$event->eventDescription}} </p>
                                     @foreach($event->eventImages as $image)   
-                                        <img src="{{asset('storage')}}/{{$image->image_name}}" height=150px>
+                                        <img onClick="document.location.href = '{{asset('storage')}}/{{$image->image_name}}'" src="{{asset('storage')}}/{{$image->image_name}}" height=150px>
                                     @endforeach  
                                 <p> Долгота: {{$event->longitude}} </p>
                                 <p> Широта: {{$event->latitude}} </p>    
@@ -123,9 +127,11 @@
                                             <form action="/deleteCommentImages" method="POST">
                                             @csrf
                                             @foreach ($comment->commentImages as $commentImage)             
-                                                <input type="hidden" name="comment_id" value="{{$comment->id}}">
-                                                <img src="{{asset('storage')}}/{{$commentImage->image_name}}" height=60px> 
-                                                <input type="checkbox" name="comment_images_id[]" value="{{$commentImage->comment_image_id}}">                                     
+                                                <input type="hidden" name="comment_id" value="{{$comment->id}}">                                                
+                                                <img onClick="document.location.href = '{{asset('storage')}}/{{$commentImage->image_name}}'" src="{{asset('storage')}}/{{$commentImage->image_name}}" height=60px> 
+                                                <div style="display: inline; position: relative">
+                                                <input type="checkbox" name="comment_images_id[]" value="{{$commentImage->image_id}}" style="position:absolute; top:-13px; right:13px">  
+                                                </div                                   
                                             @endforeach
                                             <br><br>
                                             <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Удалить  изображения">
@@ -138,7 +144,7 @@
                                         </form>
                                     @else
                                         @foreach ($comment->commentImages as $commentImage)
-                                            <img src="{{asset('storage')}}/{{$commentImage->image_name}}" height=60px>       
+                                            <img onClick="document.location.href = '{{asset('storage')}}/{{$commentImage->image_name}}'" src="{{asset('storage')}}/{{$commentImage->image_name}}" height=60px>       
                                         @endforeach
                                     @endif
                                 @endforeach

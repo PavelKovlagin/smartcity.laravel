@@ -83,7 +83,7 @@ class RegisterController extends Controller
             'c_password' => 'required|same:password',
         ]);
          if ($validator->fails()) {
-             return $this->sendError('Validation Error.', $validator->errors(), 200);
+             return $this->sendError($validator->errors(), 'Validation error', 418);
          }
          if(User::where('email', '=', $request->email)->exists())
          {

@@ -72,9 +72,10 @@ class User extends Authenticatable
     protected static function selectUser($user_id) {
         $user = User::selectUsers()
         ->where('users.id', '=', $user_id)
-        ->get()[0];
+        ->first();
+        if ($user == null) return false;
         if ($user->blockDate > Carbon::now()) {
-            $user->blocked = "Заблокирован до " . $user->blockDate;
+            $user->blocked = true;
         } else {
             $user->blocked = false;
         }

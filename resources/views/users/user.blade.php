@@ -16,8 +16,8 @@
                             @if ($authUser <> false
                                 AND (($user->user_id == $authUser->user_id)
                                 OR ($authUser->levelRights > 1 AND $authUser->levelRights > $user->levelRights))) 
-                                    @if ($user->blocked <> false)
-                                        <p class="error"> {{$user->blocked}} </p>
+                                    @if ($user->blocked)
+                                        <p class="error"> Полльзователь заблокирован до {{$user->blockDate}} </p>
                                     @endif      
                                 <form action="{{ url('/updateUser') }}" method="POST">
                                 @csrf

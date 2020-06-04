@@ -16,7 +16,7 @@ class EventImageController extends Controller
         $deletedImages = 0;
         foreach ($images as $image) {
             if (($authUser->levelRights > $image->user_levelRights) OR ($authUser->user_id == $image->user_id)) {
-                App\EventImage::destroy($image->event_image_id);
+                App\EventImage::destroy($image->image_id);
                 $deletedImages++;
             }            
         }

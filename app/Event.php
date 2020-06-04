@@ -64,6 +64,7 @@ class Event extends Model
         ->first();
         if ($event == null) return null;
         $event->eventImages = Image::checkExistsImages(EventImage::selectEventImages($event_id)->get());
+        $event->comments = Comment::selectCommentsFromEvent($event_id);
         return $event;
     }  
     //изменение категории для событий определенной категории

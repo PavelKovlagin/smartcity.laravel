@@ -19,7 +19,7 @@ class CommentController extends Controller
         return $this->sendResponse($comments, count($comments));
     }
 
-    //добавление комментария и перенаправление на страницу события с сообщением
+    //Добавление комментария и перенаправление на страницу события, к которому был добавлен комментарий. Параметры: $request – параметры POST запроса
     public function addComment(Request $request) {        
         $validator = Validator::make($request->all(), [
             "comment" => "required",
@@ -37,7 +37,7 @@ class CommentController extends Controller
             return array("response" => "Comment not added");
         }
     }
-
+    //добавление комментария в web
     public function webAddComment(Request $request){
         
         $response = $this->addComment($request);
@@ -49,7 +49,7 @@ class CommentController extends Controller
                 return back()->with(["error" => "Пользователь не авторизован"]);
             break;
             case "User blocked":
-                return back()->with(["error" => "Пользователь заблокирован до " . $response["dateBlock"]]);
+                return back()->with(["error" => "Вы не можете отправлять комментарии, Ваш профиль заблокирован до " . $response["dateBlock"]]);
             break;
             case "Comment not added":
                 return back()->with(["error" => "Комментарий не добавлен"]);
@@ -60,7 +60,7 @@ class CommentController extends Controller
         }
     }
 
-    //API добавления комментария
+    //добавление комментария с помощью API
     public function apiAddComment(Request $request) {
         $response = $this->addComment($request);
         switch ($response["response"]) {

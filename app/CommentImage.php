@@ -16,9 +16,7 @@ class CommentImage extends Model
         ->join('users', 'users.id', '=', 'user_id')
         ->join('roles', "roles.id", "=", "users.role_id")
         ->select(
-            'comment_images.id as comment_image_id',
-            'images.id as image_id', 
-            'comment_id', 
+            'comment_images.id as image_id', 
             'images.name as image_name',
             'users.id as user_id',
             'roles.levelRights as user_levelRights'
@@ -30,6 +28,12 @@ class CommentImage extends Model
         $commentImages = CommentImage::selectCommentsImages()
         ->where("comment_id", "=", $comment_id);
         return $commentImages;
+    }
+    //запрос списка изображений по списку id
+    public static function selectImages($images_id){
+        $images = CommentImage::selectCommentsImages()
+        ->whereIn("comment_images.id", $images_id);
+        return $images;
     }
     //запрос определенного по идентификатору изображения
     public static function selectCommentImage($commentImage_id) {

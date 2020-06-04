@@ -8,19 +8,17 @@ use App;
 
 class CommentImageController extends Controller
 {
-    //удаление изображения
-    public function deleteCommentImages(Request $request){
+    //Удаление изображений комментари. Параметры: $request – параметры POST запроса
+    public function deleteCommentImages(Request $request){        
         if ($request->comment_images_id == null) return array("response" =>"Images null");
-        $comment = App\Comment::selectComment($request->comment_id);
-        if ($comment == null) return array("response" => "Comment not found");
+        $images = App\CommentImage::selectImages($request->comment_images_id)->get();
         $authUser = App\User::selectAuthUser();
-        $user = App\User::selectUser($comment->user_id);
         if ($authUser == false) return array("response" => "User not authorized");    
         $deletedImages = 0;
-        foreach ($request->comment_images_id as $comment_image_id) {
-            if (($authUser->levelRights > $user->levelRights)
-                OR ($authUser->user_id == $user->user_id)) {
-                App\CommentImage::destroy($comment_image_id);
+        foreach ($images as $image) {
+            if (($authUser->levelRights > $image->user_levelRights)
+                OR ($authUser->user_id == $image->user_id)) {
+                App\CommentImage::destroy($image->image_id);
                 $deletedImages++;
             }
         }       
@@ -30,9 +28,6 @@ class CommentImageController extends Controller
     public function webDeleteCommentImages(Request $request){
         $response = $this->deleteCommentImages($request);
         switch ($response["response"]) {
-            case "Comment not found":
-                return back()->with(["message" => "Комментарий не найден"]);
-            break;
             case "User not authorized":
                 return back()->with(["message" => "Пользователь не авторизован"]);
             break;
@@ -45,23 +40,17 @@ class CommentImageController extends Controller
     } 
 
     //api удаления изображения
-    public function apiDeleteCommentImagesZz(Request $request){
+    public function apiDeleteCommentImages(Request $request){        
         $response = $this->deleteCommentImages($request);
-        switch ($response) {
-            case "Comment not found":
-                return $this->sendError([], $response, 418);
-            break;
+        switch ($response["response"]) {
             case "User not authorized":
                 return $this->sendError([], $response, 418);
             break;
-            case "User level rights is low":
-                return $this->sendError([], $response, 418);
-            break;
-            case "Images not selected":
+            case "Images null":
                 return $this->sendError([], $response, 418);
             break;
             case "Images deleted":
-                return $this->sendResponse($request, $response);
+                return $this->sendResponse($request->all(), $response);
             break;
         }      
     }
