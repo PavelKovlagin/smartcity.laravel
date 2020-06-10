@@ -40,14 +40,14 @@ class Controller extends BaseController
         });
         return true;
     }
-    //Проверка наличия изображений в файловой системе. Параметры: $images – массив, который содержит информацию об изображениях
-    public function checkExistsImages($images){
-        foreach ($images as $key => $image){
-            if (Storage::disk("public")->exists($image->image_name) == false){        
-                unset($images[$key]);        
-                DB::table('images')->where('name', '=', $image->image_name)->delete();
-            }
-        }   
-        return $images;
-    }
+    // //Проверка наличия изображений в файловой системе. Параметры: $images – массив, который содержит информацию об изображениях
+    // public function checkExistsImages($images){
+    //     foreach ($images as $key => $image){
+    //         if (Storage::disk("public")->exists($image->image_name) == false){        
+    //             unset($images[$key]);        
+    //             DB::table('images')->where('name', '=', $image->image_name)->delete();
+    //         }
+    //     }   
+    //     return $images;
+    // }
 }
