@@ -58,7 +58,6 @@ class User extends Authenticatable
             'code_reset_password',
             'validity_password_reset_code',
             'levelRights',
-            'notRemove',
         );
         return $users;
     }
@@ -73,9 +72,10 @@ class User extends Authenticatable
     protected static function selectUser($user_id) {
         $user = User::selectUsers()
         ->where('users.id', '=', $user_id)
-        ->get()[0];
+        ->first();
+        if ($user == null) return false;
         if ($user->blockDate > Carbon::now()) {
-            $user->blocked = "Заблокирован до " . $user->blockDate;
+            $user->blocked = true;
         } else {
             $user->blocked = false;
         }

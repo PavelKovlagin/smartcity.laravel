@@ -27,7 +27,7 @@
                         <a class="nav-link" href="/categories">Категории</a>
                     </li>  
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Админские штучки</a>
+                        <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Панель администратора</a>
                         <div class="dropdown-menu" aria-labelledby="dropdown01">
                         <a class="dropdown-item" href="/deleteImagesWithoutLink">Удалить неиспользуемые изображения</a>
                         </div>

@@ -9,7 +9,7 @@ use App;
 
 class CategoryController extends Controller
 {
-    //передача данных И открытие представления categories 
+    //передача данных и открытие представления categories 
     public function showCategories() {
         $authUser = App\User::selectAuthUser();
         $categories = App\Category::selectcategories()->paginate(10);
@@ -24,7 +24,7 @@ class CategoryController extends Controller
         $categories = App\Category::selectCategories()->get();
         return $this->sendResponse($categories, count($categories));
     }
-    //передача данных и открытие представления category 
+    //Передача данных и открытие представления category. Параметры: $category_id – идентификатор категории
     public function showCategory($category_id) {
         $authUser = App\User::selectAuthUser();
         $category = App\Category::find($category_id);
@@ -33,7 +33,7 @@ class CategoryController extends Controller
             'category' => $category
         ]);
     }
-    //обновление категории и перенаправление на страницу с обновленной категорией
+    //Обновление информации о категории и перенаправление на страницу с обновленной категорией. Параметры: $request – параметры POSTзапроса
     public function updateCategory(Request $request) {
         $authUser = App\User::selectAuthUser();
         $category = App\Category::find($request->id);
@@ -44,12 +44,12 @@ class CategoryController extends Controller
             return "У вас недостаточно прав";
         }
     }
-    //добавление новой категории и перенаправление на страницу со списком категорий
+    //Добавление новой категории и перенаправление на страницу со списком категорий. Параметры: $request – параметры POSTзапроса
     public function addCategory(Request $request){
         App\Category::insertCategory($request);
         return redirect("/categories");
     }
-    //удаление категории и перенаправление на страницу со списком всех категорий
+    //Удаление категории и перенаправление на страницу со списком всех категорий. Параметры: $request – параметры POSTзапроса
     public function deleteCategory(Request $request) {
         App\Event::changeCategory($request->id);
         $authUser = App\User::selectAuthUser();

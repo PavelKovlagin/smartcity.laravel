@@ -14,6 +14,7 @@
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
+
 Route::get('/', function(){
         $events = App\Event::selectVisibilityEvents()->get();
         return view('welcome',
@@ -85,13 +86,13 @@ Route::get('/events/addEvent', function(){
         'categories' => App\Category::selectCategories()->get()]);
 });
 
-Route::post('/updateEvent', 'EventController@updateEvent');
+Route::post('/updateEvent', 'EventController@webUpdateEvent');
 
 Route::post('/updateEventStatus', 'EventController@updateEventStatus');
 
 Route::get('/events/{id}', 'EventController@showEvent');
 
-Route::post('/addEvent', 'EventController@addEvent');
+Route::post('/addEvent', 'EventController@webAddEvent');
 
 Route::get('/deleteEvent/{event_id}', 'EventController@deleteEvent');
 

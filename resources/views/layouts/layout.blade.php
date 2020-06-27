@@ -15,13 +15,13 @@
 
 <body>
     @include('layouts/header')
-    <br>         
+    <br>        
     <div class="jumbotron">
       <div class="container">
         @yield('content')
       </div>
     </div>
-
+    <br>
     <div class="container">
       <div class="row">
         <div class="col-md-4">

@@ -7,52 +7,51 @@ use App;
 
 class EventImageController extends Controller
 {
-    //удаление изображений события
-    public function deleteEventImages(Request $request){
-        if ($request->event_images_id == null) return "Images null";
+    //Удаление изображений событий. Параметры: $request – параметры POST запроса
+    public function deleteEventImages(Request $request){        
+        if ($request->event_images_id == null) return array("response" => "Images null");
         $images = App\EventImage::selectImages($request->event_images_id)->get();
         $authUser = App\User::selectAuthUser();
-        if ($authUser == false) return "User not authorized";
+        if ($authUser == false) return array("response" => "User not authorized");
+        $deletedImages = 0;
         foreach ($images as $image) {
             if (($authUser->levelRights > $image->user_levelRights) OR ($authUser->user_id == $image->user_id)) {
-                App\EventImage::destroy($image->event_image_id);
+                App\EventImage::destroy($image->image_id);
+                $deletedImages++;
             }            
         }
-        return "Images deleted";
+        return array("response" => "Images deleted", "Deleted images" => $deletedImages);
     }
 
     //web удаления изображений события
     public function webDeleteEventImages(Request $request){
         $response = $this->deleteEventImages($request);
-        switch ($response) {
+        switch ($response["response"]) {
             case "User not authorized":
-                return back()->with(["error" => "Пользователь не авторизован"]);
+                return back()->with(["message" => "Пользователь не авторизован"]);
             break;
             case "Images deleted":
-                return back()->with(["error" => "Изображения удалены"]);
+                return back()->with(["message" => "Изображений удалено: " . $response["Deleted images"]]);
             break;
             case "Images null":
-                return back()->with(["error" => "Изображения не найдены"]);
+                return back()->with(["message" => "Изображения не найдены"]);
             break;
         }
     }
 
     //api удаления изображений события
     public function apiDeleteEventImages(Request $request){
-        $eventImage = App\EventImage::selectEventImage($request->image_id);
-        if ($eventImage == null) {
-            return $this->sendError($request->all(), "Image not found", 418);
-        } else {
-            $authUser = App\User::selectAuthUser();
-            $user = App\User::selectUser($eventImage->user_id);
-            if ($authUser <> false
-                AND (($authUser->levelRights > $user->levelRights)
-                    OR ($authUser->user_id == $user->user_id))){
-                App\EventImage::destroy($request->image_id);
-                return $this->sendResponse($request->all(), "Image delete");
-            } else {
-                return $this->sendError($request->all(), "User failed", 418); 
-            }            
-        }        
+        $response = $this->deleteEventImages($request);
+        switch ($response["response"]) {
+            case "User not authorized":
+                return $this->sendError([], $response["response"], 418);
+            break;
+            case "Images deleted":
+                return $this->sendResponse($request->all(), $response["response"] . ": " . $response["Deleted images"]);
+            break;
+            case "Images null":
+                return $this->sendError([], $response["response"], 418);
+            break;
+        }       
     }
 }

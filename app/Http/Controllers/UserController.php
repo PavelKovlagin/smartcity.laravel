@@ -13,7 +13,7 @@ use App;
 
 class UserController extends Controller
 {
-    //передача данных и открытие страницы с информацией о пользователе
+    //Открытие представления user с информацией о пользователе. Параметры: $user_id – идентификатор пользователя
     public function showUser($user_id) {
         $user = App\User::selectUser($user_id);
         $authUser = App\User::selectAuthUser();
@@ -27,7 +27,7 @@ class UserController extends Controller
             'authUser' => $authUser,
             'user' => $user]);
     }
-    //передача данных и открытие страницы со списком всех пользователей
+    //Открытие представления users с информацией о пользователях 
     public function showUsers(){
         $users = App\User::selectUsers()->paginate(10);
         $authUser = App\User::selectAuthUser(); 
@@ -37,12 +37,14 @@ class UserController extends Controller
             'authUser' => $authUser,
             'users' => $users]);
     }
-    //блокировка пользователя до определенной даты и перенаправление на страницу со всеми пользователями
+    //Блокировка пользователя до определенной даты. Параметры: $request – параметры POST запроса
     public function blockedUser(Request $request) {
-        \App\User::blockedUser($request->user_id, $request->blockDate);
+        $blockDate = $request->blockDate;
+        if ($blockDate == null) $blockDate = '0000-01-01';
+        \App\User::blockedUser($request->user_id, $blockDate);
         return redirect("/users");
     }
-    //обновление информации о пользователе
+    //Обновление информации о пользователе. Параметры: $request – параметры POST запроса
     public function updateUser(Request $request){
         $authUser = App\User::selectAuthUser();
         $user = App\User::selectUser($request->user_id);
@@ -75,7 +77,7 @@ class UserController extends Controller
             return $this->sendError($request->all(), "Failed user update", 419);
         }
     }
-    //обновление роли пользователя и перенаправление на страницу пользователя
+    //Обновление роли пользователя. Параметры: $request – параметры POST запроса
     public function updateRole(Request $request) {
         \App\User::updateRole($request->user_id, $request->role_id);
         return redirect("/users/user/$request->user_id");
@@ -93,7 +95,7 @@ class UserController extends Controller
             $this->sendError([], "Reset code not was sent", 418);
         }
     }
-    //отправка кода сброса пароля пользователю
+    //Отправка кода сброса пароля на электронную почту. Параметры: $request – параметры POST запроса
     public function sendCode(Request $request) {
         $user = App\User::selectUser_email($request->email);
         if ($user == null){
@@ -120,12 +122,22 @@ class UserController extends Controller
         }
     }
     //api запроса пользователя
-    public function apiSelectUser(Request $request){
-        $authUser = App\User::selectAuthUser();
+    public function apiSelectMyProfile(Request $request){
+        $authUser = App\User::selectUser(Auth::user() -> id);
         if ($authUser == null) return $this->sendError([], "Failed user", 418);
-        return $this->sendResponse($authUser, "User");
+        $events = App\Event::selectUserEvents($authUser->user_id)->get();
+        return $this->sendResponse(["user" => $authUser, 'events' => $events], $authUser->surname . " " . $authUser->user_name . " " . $authUser->subname);
     }
-    //изменение пароля
+
+    //api запроса пользователя
+    public function apiSelectUser($user_id){
+        $user = App\User::selectUser($user_id);        
+        if ($user == false) return $this->sendError([], "Failed user", 418);
+        $events = App\Event::selectVisibilityUserEvents($user->user_id)->get();
+        return $this->sendResponse(["user" => $user, "events" => $events], $user->surname . " " . $user->user_name . " " . $user->subname);
+    }
+
+    //Изменение пароля для пользователя. Параметры: $request – параметры POST запроса
     public function passwordChange(Request $request) {
         $user = App\User::selectUser_email($request->email);
         if ($user == null) {

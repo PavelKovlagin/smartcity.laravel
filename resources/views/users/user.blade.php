@@ -16,8 +16,8 @@
                             @if ($authUser <> false
                                 AND (($user->user_id == $authUser->user_id)
                                 OR ($authUser->levelRights > 1 AND $authUser->levelRights > $user->levelRights))) 
-                                    @if ($user->blocked <> false)
-                                        <p class="error"> {{$user->blocked}} </p>
+                                    @if ($user->blocked)
+                                        <p class="error"> Полльзователь заблокирован до {{$user->blockDate}} </p>
                                     @endif      
                                 <form action="{{ url('/updateUser') }}" method="POST">
                                 @csrf
@@ -35,7 +35,7 @@
                                         @if($authUser->levelRights == 3)
                                         <form action="{{ url('/updateRole') }}" method="POST">
                                             @csrf
-                                            <input  type="hidden" name="user_id" value="{{$user->user_id}}">
+                                            <input type="hidden" name="user_id" value="{{$user->user_id}}">
                                             <select class="form-control" name="role_id">
                                                 @foreach($roles as $role)
                                                 <option @if($user->role_id == $role->role_id) selected @endif value="{{$role->role_id}}">{{$role->role_name}}</option>
