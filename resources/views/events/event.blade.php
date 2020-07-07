@@ -15,11 +15,21 @@
                             <p class="error"> {{session('error')}} </p>
                             <p> Пользователь: <a href="/users/user/{{$user->user_id}}"> {{$event->email}}</a> </p>
                             <p> Дата создания: {{$event->event_date}} </p>
-                            <p> Дата последнего обновления: {{$event->dateChange}} </p>
+                            <p> Дата последнего обновления: {{$event->dateChange}} </p>                            
                             @if ($authUser <> false 
                                 AND (($event->user_id == $authUser -> user_id) AND ($event->status_id == 1)
                                 OR ($authUser->levelRights > 1) AND (($authUser->levelRights > $user->levelRights) OR ($authUser->user_id == $user->user_id))))
-                                    
+                                    <form action="/changeEventViewed" method="POST">
+                                        @csrf
+                                        @if($event->user_id == $authUser->user_id)
+                                            <input type="hidden" name="event_id" value="{{$event->id}}">
+                                            @if($event->viewed == 0)
+                                                <input type="submit" value="Пометить как просмотренное">
+                                            @else
+                                                <input type="submit" value="Пометить как не просмотренное">
+                                            @endif
+                                        @endif
+                                    </form>
                                     @if (count($event->eventImages) > 0)
                                         <form action="/deleteEventImages" method="POST">
                                         @csrf                 

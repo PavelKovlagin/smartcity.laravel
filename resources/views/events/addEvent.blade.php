@@ -11,6 +11,16 @@
     var longitude = 40.406635;
     var latitude = 56.129057;
 
+    function changeCenter() {
+        var cityCenter = cityForm.LatLon;
+        var selectedOption = cityCenter.options[cityCenter.selectedIndex];
+        var arr = selectedOption.value.split('|');
+        longitude = arr[1];
+        latitude = arr[0];
+        myMap.destroy();
+        init();
+    };
+
     function changeMyCoords(){
 
         var options = {
@@ -83,8 +93,16 @@
             <div class="card">
                 <div class="card-header">Добавить новое событие</div>                
                 <div class="card-body">
-                    <div class="col-md-12">
+                    <div class="col-md-12">                        
                         <p class="error">{{session("message")}}</p>
+                        <form name='cityForm'>
+                            <p>Город: <select class="form-control" name = "LatLon">
+                            @foreach($cities as $city)
+                                <option value="{{ $city->city_latitude }}|{{ $city->city_longitude }}">{{ $city->city_name }}</option>
+                            @endforeach
+                            </select></p>
+                            <input class="btn btn-outline-success my-2 my-sm-0" type="button" onClick="changeCenter()" value="Выбрать город">
+                        </form>
                         <form enctype="multipart/form-data" action="{{ url('/addEvent') }}" method="POST">
                         {{ csrf_field() }} 
                         <p> Название события:</p>

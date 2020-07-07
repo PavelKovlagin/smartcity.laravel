@@ -29,7 +29,9 @@ class Event extends Model
             'categoryName',
             'users.id as user_id',
             'email',
-            'visibilityForUser');
+            'visibilityForUser',
+            'viewed'
+        );
         return $events;
     }
     //запрос видимых событий
@@ -67,6 +69,20 @@ class Event extends Model
         $event->comments = Comment::selectCommentsFromEvent($event_id);
         return $event;
     }  
+    protected static function getNotViewedEventCount($user_id) {
+        $count = DB::table('events')
+        ->where([
+            ['user_id', '=', $user_id],
+            ['viewed', '=', '0']
+        ])
+        ->count();
+        return $count;
+    }
+    protected static function changeEventViewed($event_id, $viewed) {       
+        DB::table('events')
+        ->where('id', '=', $event_id)
+        ->update(array('viewed' => $viewed));
+    }
     //изменение категории для событий определенной категории
     protected static function changeCategory($currentCategory_id){
         $firstCategory_id = Category::selectCategories()->get()[0]->id;

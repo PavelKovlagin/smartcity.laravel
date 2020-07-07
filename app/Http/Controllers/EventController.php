@@ -56,6 +56,26 @@ class EventController extends Controller
             return array("response" => "Event not added");
         }
     }
+    public static function qwerty(){
+        $authUser = App\User::selectAuthUser();
+        if ($authUser == false) return "123";
+        $count = App\Event::getNotViewedEventCount($authUser->user_id);
+        if ($count <= 0) return "";
+        return "+".$count; 
+    }
+
+    public function changeEventViewed(Request $request) {
+        $event = App\Event::selectEvent($request->event_id);
+        $authUser = App\User::selectAuthUser();
+        if ($event == null) return "Событие не найдено";
+        if ($event->user_id <> $authUser->user_id) return "Это не ваше событие";
+        if ($event->viewed == 0) {
+            App\Event::changeEventViewed($request->event_id, 1);
+        } else {
+            App\Event::changeEventViewed($request->event_id, 0);
+        }
+        return back();
+    }
     //добавление события в WEB
     public function webAddEvent(Request $request){        
         $response = $this->addEvent($request);

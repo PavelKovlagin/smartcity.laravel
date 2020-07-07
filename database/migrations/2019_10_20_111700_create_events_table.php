@@ -27,6 +27,7 @@ class CreateEventsTable extends Migration
             $table->text('eventDescription');          
             $table->date('date');
             $table->dateTime('dateChange');
+            $table->boolean('viewed');
             $table->timestamps();
         });
     }

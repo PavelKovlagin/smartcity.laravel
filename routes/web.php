@@ -83,8 +83,11 @@ Route::get('/events', 'EventController@showEvents');
 Route::get('/events/addEvent', function(){
         return view('events.addEvent', 
         ['authUser' => App\User::selectAuthUser(),
+        'cities' => App\City::selectCities()->get(),
         'categories' => App\Category::selectCategories()->get()]);
 });
+
+Route::post("/changeEventViewed", "EventController@changeEventViewed");
 
 Route::post('/updateEvent', 'EventController@webUpdateEvent');
 
@@ -107,6 +110,18 @@ Route::post('/deleteCommentImages', 'CommentImageController@webDeleteCommentImag
 Route::post('/addComment', 'CommentController@webAddComment');
 
 Route::post('/deleteComment', 'CommentController@wedDeleteComment');
+
+//работа с городами
+
+Route::get('/cities', 'CityController@showCities');
+
+Route::get('/cities/{id}', 'CityController@showCity');
+
+Route::get('/cities/addCity', function(){
+        return view('cities.addCity');
+});
+
+Route::post('/addCity', 'CityController@addCity');
 
 //работа с изображениями
 

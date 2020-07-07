@@ -20,7 +20,8 @@ class EventsTableSeeder extends Seeder
         'eventName'=>'Тестовое событие. Рассматривается',
         'eventDescription'=>'Это событие рассматривается',
         'date'=>'2019-10-28',
-        'dateChange'=>'2019-10-28'
+        'dateChange'=>'2019-10-28',
+        'viewed' => 0
       ]);
       DB::table('events')->insert([
         'user_id'=>1,
@@ -31,7 +32,8 @@ class EventsTableSeeder extends Seeder
         'eventName'=>'Тестовое событие. Отклонено',
         'eventDescription'=>'Это событие отклюнено',
         'date'=>'2019-10-28',
-        'dateChange'=>'2019-10-28'
+        'dateChange'=>'2019-10-28',
+        'viewed' => 0
       ]);
       DB::table('events')->insert([
         'user_id'=>1,
@@ -42,7 +44,8 @@ class EventsTableSeeder extends Seeder
         'eventName'=>'Тестовое событие. Выполняется',
         'eventDescription'=>'Это событие выполняется',
         'date'=>'2019-10-28',
-        'dateChange'=>'2019-10-28'
+        'dateChange'=>'2019-10-28',
+        'viewed' => 0
       ]);
       DB::table('events')->insert([
         'user_id'=>1,
@@ -53,7 +56,8 @@ class EventsTableSeeder extends Seeder
         'eventName'=>'Тестовое событие. Завершено',
         'eventDescription'=>'Это событие завершено',
         'date'=>'2019-10-28',
-        'dateChange'=>'2019-10-28'
+        'dateChange'=>'2019-10-28',
+        'viewed' => 0
       ]);
     }
 }

@@ -11,7 +11,7 @@
             </li>
             @if(Auth::check())
             <li class="nav-item">
-                <a class="nav-link" href="/events?user_id={{Auth::user() -> id }}">Мои события</a>
+                <a class="nav-link" href="/events?user_id={{Auth::user() -> id }}">Мои события{{App\Http\Controllers\EventController::qwerty()}}</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/users/user/{{Auth::user()->id}}">Мои профиль</a>
@@ -31,7 +31,7 @@
                         <div class="dropdown-menu" aria-labelledby="dropdown01">
                         <a class="dropdown-item" href="/deleteImagesWithoutLink">Удалить неиспользуемые изображения</a>
                         </div>
-                    </li>       
+                    </li>     
                 @endif
             @endif
 

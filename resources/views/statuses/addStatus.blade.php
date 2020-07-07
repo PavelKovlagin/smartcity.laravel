@@ -16,8 +16,7 @@
                                 <p> Название статуса:</p>
                                 <input class="form-control" type="text" name="statusName" required>
                                 <p> Описание события:</p>
-                                <textarea class="form-control" type="text" name="statusDescription" required>
-                            </textarea>
+                                <textarea class="form-control" type="text" name="statusDescription" required></textarea>
                             <p>Видимость для пользователя</p>
                             <p><select class="form-control" name = "visibilityForUser">
                                     <option value=0>Невидимый</option>
